@@ -1,0 +1,47 @@
+title: Cadenza · Stoller Hall
+slides:
+  - id: welcome
+    kind: intro
+    title: A shared listening experience
+    body: Welcome to Stoller Hall
+    captions: true
+    notes: Welcome the audience. Check caption visibility before continuing.
+  - id: mc
+    kind: mc
+    title: Listen. Notice. Respond.
+    body: Your experience is part of the experiment.
+    captions: true
+    notes: Explain the procedure and response method.
+  - id: experiment-1
+    kind: experiment
+    title: Listening experiment · 01
+    body: Please turn to the passage shown below.
+    passage: A
+    page: 3
+    captions: true
+    notes: Example passage and page — replace with the actual programme.
+  - id: music-1
+    kind: music
+    title: A moment to listen
+    body: Please listen to the orchestra.
+    captions: false
+    notes: Cue the musicians. Advance manually when the passage ends.
+  - id: response-1
+    kind: response
+    title: What did you hear?
+    body: Please record your response now.
+    duration: 30
+    captions: false
+    notes: Press Start to begin the countdown. At zero, hold until the operator advances.
+  - id: music-2
+    kind: countup
+    title: Listening experiment · 02
+    body: Please listen to the orchestra.
+    captions: false
+    notes: Show the timer while the MC explains. Press Start when the conductor begins, and Stop when the music ends. Returning resets to zero and waits for Start.
+  - id: closing
+    kind: closing
+    title: Thank you for listening
+    body: Cadenza · Stoller Hall
+    captions: true
+    notes: Closing remarks and questions.
