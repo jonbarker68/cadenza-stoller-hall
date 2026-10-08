@@ -93,7 +93,7 @@ The shared **Timer** row controls either timer type. **Start** begins, **Pause**
 
 ## Booklet-aligned running order
 
-The 25-slide show contains one MC introduction, ten listening/response pairs, an excerpt-rating close, a cue-marking introduction, a cue-marking timer, and a final close. Hold the opening MC slide for the event introduction and Movement I, switching captions OFF during music. Background questionnaire pages 3–4, definitions page 5, and activity instructions page 6 are covered in the MC notes.
+The 26-slide show opens with a photographic arrivals slide, followed by one MC introduction, ten listening/response pairs, an excerpt-rating close, a cue-marking introduction, a cue-marking timer, and a final close. Hold the opening MC slide for the event introduction and Movement I, switching captions OFF during music. Background questionnaire pages 3–4, definitions page 5, and activity instructions page 6 are covered in the MC notes.
 
 | Excerpt | Booklet page | Focus |
 | --- | --- | --- |
@@ -113,3 +113,7 @@ For each excerpt, select **AUTO** for the spoken introduction, stay on the same 
 Cue marking is optional during Movement V. Introduce page **20**, with continuation on page **21**. Advance to the count-up slide before the music starts, then press **Start** exactly when it begins. The audience records approximate **MM:SS** times and brief experiences. Press **Stop** at the end and advance to the final close when ready. Restore **AUTO** for spoken closing remarks.
 
 Audience styling remains in `src/cadenza/qml/DisplayStyle.qml`; `qmldir` registers the singleton and is included in packaged installations. Live microphone transcription and second-monitor presentation still require a venue rehearsal.
+
+### Arrivals screen
+
+The show opens with the orchestra photograph and event details, using lime and pink accents from the event flier. Leave captions on AUTO while the audience takes their seats; the arrivals slide hides captions. Press Next when the event begins to show the MC introduction with captions enabled. The photograph is bundled in `src/cadenza/qml/assets/orchestra.jpg`. The `arrivals` kind uses `ArrivalsSlide.qml`; its title and repertoire text come from the show YAML.

@@ -1,6 +1,15 @@
 # Audience Booklet: Stoller Hall, 29 October 2026. Page numbers are printed booklet pages.
 title: Cadenza · Stoller Hall
 slides:
+- id: arrivals
+  kind: arrivals
+  title: Research concert
+  body: 'Beethoven’s Symphony No. 6
+
+    The Pastoral Symphony'
+  captions: false
+  notes: Display while the audience arrives and takes their seats. Keep captions on AUTO (hidden on this slide).
+    Advance once when the event begins to show the existing MC introduction; captions then appear automatically.
 - id: mc-introduction
   kind: mc
   title: Welcome to the research concert

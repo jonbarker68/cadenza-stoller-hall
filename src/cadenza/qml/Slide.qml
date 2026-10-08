@@ -10,7 +10,14 @@ Rectangle {
         height / DisplayStyle.referenceHeight
     )
 
+    ArrivalsSlide {
+        anchors.fill: parent
+        visible: slide.state.kind === "arrivals"
+        state: slide.state
+    }
+
     Rectangle {
+        visible: slide.state.kind !== "arrivals"
         x: 0
         y: 0
         width: parent.width
@@ -19,6 +26,7 @@ Rectangle {
     }
 
     Text {
+        visible: slide.state.kind !== "arrivals"
         x: DisplayStyle.sideMargin * slide.scaleUnit
         y: DisplayStyle.headerY * slide.scaleUnit
         text: "CADENZA  /  STOLLER HALL"
@@ -42,6 +50,7 @@ Rectangle {
 
     Column {
         objectName: "instructions"
+        visible: slide.state.kind !== "arrivals"
         x: DisplayStyle.sideMargin * slide.scaleUnit
         y: DisplayStyle.contentY * slide.scaleUnit
         width: parent.width - 2 * DisplayStyle.sideMargin * slide.scaleUnit

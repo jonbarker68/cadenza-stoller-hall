@@ -3,7 +3,7 @@ import math
 import time
 import yaml
 
-KINDS = {'intro', 'mc', 'experiment', 'music', 'response', 'countup', 'closing'}
+KINDS = {'arrivals', 'intro', 'mc', 'experiment', 'music', 'response', 'countup', 'closing'}
 
 
 def load_show(path):

@@ -18,7 +18,11 @@ class ProgrammeTests(unittest.TestCase):
         self.addCleanup(lambda: c.timer.stop())
         now = [0.0]
         c.timeline.now = lambda: now[0]
-        self.assertEqual(c.state['count'], 25)
+        self.assertEqual(c.state['count'], 26)
+        self.assertEqual(c.state['kind'], 'arrivals')
+        self.assertFalse(c.state['captions'])
+        c.move(1)
+        self.assertTrue(c.state['captions'])
         self.assertEqual(c.state['kind'], 'mc')
         for number, page in enumerate([7, 8, 9, 10, 12, 14, 15, 16, 18, 19], 1):
             c.move(1)
@@ -62,4 +66,4 @@ class ProgrammeTests(unittest.TestCase):
         c.setOverride('AUTO')
         self.assertTrue(c.state['captions'])
         c.move(1)
-        self.assertEqual(c.state['index'], 24)
+        self.assertEqual(c.state['index'], 25)
