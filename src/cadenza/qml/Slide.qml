@@ -2,6 +2,7 @@ import QtQuick
 
 Rectangle {
     id: slide
+    objectName: "presentationSlide"
     color: DisplayStyle.background
     property var state: controller.state
     property real scaleUnit: Math.min(
@@ -26,7 +27,21 @@ Rectangle {
         font.letterSpacing: DisplayStyle.headerLetterSpacing * slide.scaleUnit
     }
 
+    Text {
+        objectName: "bookletContext"
+        x: DisplayStyle.sideMargin * slide.scaleUnit
+        y: 100 * slide.scaleUnit
+        width: parent.width - 2 * x
+        text: (slide.state.passage ? "EXCERPT " + slide.state.passage + "     ·     " : "")
+              + (slide.state.page ? "BOOKLET PAGE " + slide.state.page : "")
+        color: DisplayStyle.accent
+        font.pixelSize: DisplayStyle.passageFontPx * slide.scaleUnit
+        font.weight: Font.DemiBold
+        textFormat: Text.PlainText
+    }
+
     Column {
+        objectName: "instructions"
         x: DisplayStyle.sideMargin * slide.scaleUnit
         y: DisplayStyle.contentY * slide.scaleUnit
         width: parent.width - 2 * DisplayStyle.sideMargin * slide.scaleUnit
@@ -34,6 +49,7 @@ Rectangle {
 
         Text {
             width: parent.width
+            textFormat: Text.PlainText
             text: slide.state.title
             color: DisplayStyle.titleText
             font.pixelSize: DisplayStyle.titleFontPx * slide.scaleUnit
@@ -43,18 +59,14 @@ Rectangle {
 
         Text {
             width: parent.width
+            textFormat: Text.PlainText
             text: slide.state.body
             color: DisplayStyle.bodyText
             font.pixelSize: DisplayStyle.bodyFontPx * slide.scaleUnit
             wrapMode: Text.Wrap
         }
 
-        Text {
-            visible: slide.state.kind === "experiment"
-            text: "PASSAGE " + slide.state.passage + "     ·     PAGE " + slide.state.page
-            color: DisplayStyle.accent
-            font.pixelSize: DisplayStyle.passageFontPx * slide.scaleUnit
-        }
+
     }
 
     Text {
@@ -76,6 +88,7 @@ Rectangle {
     }
 
     Item {
+        objectName: "responseTimer"
         visible: slide.state.kind === "response"
         width: DisplayStyle.responseTimerSize * slide.scaleUnit
         height: width
@@ -124,13 +137,26 @@ Rectangle {
         }
     }
 
+    Text {
+        objectName: "timerLabel"
+        visible: slide.state.hasTimer
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: 535 * slide.scaleUnit
+        text: slide.state.kind === "countup" ? "ELAPSED TIME · MM:SS"
+              : (slide.state.timerPhase === "finished" ? "RESPONSE TIME COMPLETE" : "TIME TO RESPOND")
+        color: DisplayStyle.accent
+        font.pixelSize: DisplayStyle.headerFontPx * slide.scaleUnit
+    }
+
     Rectangle {
+        objectName: "captionBand"
         visible: slide.state.captions && slide.state.caption.length > 0
         anchors.bottom: parent.bottom
         anchors.bottomMargin: DisplayStyle.captionBottomMargin * slide.scaleUnit
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width - 2 * DisplayStyle.captionSideMargin * slide.scaleUnit
-        height: captionText.implicitHeight + 2 * DisplayStyle.captionPaddingY * slide.scaleUnit
+        height: DisplayStyle.captionBandHeight * slide.scaleUnit
+        clip: true
         color: DisplayStyle.captionBackground
         radius: DisplayStyle.captionRadius * slide.scaleUnit
 
@@ -138,7 +164,13 @@ Rectangle {
             id: captionText
             anchors.centerIn: parent
             width: parent.width - 2 * DisplayStyle.captionPaddingX * slide.scaleUnit
+            height: parent.height - 2 * DisplayStyle.captionPaddingY * slide.scaleUnit
             text: slide.state.caption
+            textFormat: Text.PlainText
+            fontSizeMode: Text.Fit
+            minimumPixelSize: Math.max(1, 18 * slide.scaleUnit)
+            elide: Text.ElideRight
+            verticalAlignment: Text.AlignVCenter
             color: DisplayStyle.captionText
             font.pixelSize: DisplayStyle.captionFontPx * slide.scaleUnit
             wrapMode: Text.Wrap

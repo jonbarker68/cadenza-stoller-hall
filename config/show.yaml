@@ -1,65 +1,263 @@
+# Audience Booklet: Stoller Hall, 29 October 2026. Page numbers are printed booklet pages.
 title: Cadenza · Stoller Hall
 slides:
-  - id: welcome
-    kind: intro
-    title: A shared listening experience
-    body: Welcome to Stoller Hall
-    captions: true
-    notes: Welcome the audience. Check caption visibility before continuing.
-  - id: mc
-    kind: mc
-    title: Listen. Notice. Respond.
-    body: Your experience is part of the experiment.
-    captions: true
-    notes: Explain the procedure and response method.
-  - id: passage-1
-    kind: mc
-    title: Excerpt 1 · Page 3
-    body: Please turn your booklet to the correct page.
-    captions: true
-    notes: Example passage and page — replace with the actual programme.
-  - id: response-1
-    kind: response
-    title: Excerpt 1 · Page 3
-    body: Please record your response now.
-    duration: 60
-    captions: false
-    notes: Press Start to begin the countdown. At zero, hold until the operator advances.
-  - id: passage-2
-    kind: mc
-    title: Excerpt 2 · Page 4
-    body: Please turn your booklet to the correct page.
-    captions: true
-    notes: Example passage and page — replace with the actual programme.
-  - id: response-2
-    kind: response
-    title: Excerpt 2 · Page 4
-    body: Please record your response now.
-    duration: 60
-    captions: false
-    notes: Press Start to begin the countdown. At zero, hold until the operator advances.
-  - id: passage-3
-    kind: mc
-    title: Excerpt 3 · Page 5
-    body: Please turn your booklet to the correct page.
-    captions: true
-    notes: Example passage and page — replace with the actual programme.
-  - id: response-3
-    kind: response
-    title: Excerpt 3 · Page 5
-    body: Please record your response now.
-    duration: 60
-    captions: false
-    notes: Press Start to begin the countdown. At zero, hold until the operator advances.
-  - id: music-2
-    kind: countup
-    title: Listening experiment · 02
-    body: Please listen to the orchestra.
-    captions: false
-    notes: Show the timer while the MC explains. Press Start when the conductor begins, and Stop when the music ends. Returning resets to zero and waits for Start.
-  - id: closing
-    kind: closing
-    title: Thank you for listening
-    body: Cadenza · Stoller Hall
-    captions: true
-    notes: Closing remarks and questions.
+- id: mc-introduction
+  kind: mc
+  title: Welcome to the research concert
+  body: 'Cadenza and Manchester Camerata
+
+    Listening together at Stoller Hall'
+  captions: true
+  notes: 'Select AUTO for captions. Introduce the event and voluntary participation. Background questionnaire: pages
+    3–4; definitions: page 5; research instructions: page 6. Hold here for Movement I, manually selecting OFF during
+    music, then AUTO for the research introduction. Explain the ten excerpts in pairs, the first two trial runs,
+    and one minute to respond after each. There are no right or wrong answers.'
+- id: excerpt-1
+  kind: experiment
+  title: Please turn to page 7
+  passage: '1'
+  page: 7
+  body: Listen to the excerpt, then complete your responses.
+  captions: true
+  notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 1; manually select OFF when the
+    orchestra begins. Advance only when the music ends. Booklet focus: loudness; trial run.'
+- id: response-1
+  kind: response
+  title: Complete your responses
+  passage: '1'
+  page: 7
+  body: 'Rate loudness and enjoyment.
+
+    Write 1–2 sentences about your overall impression.'
+  duration: 60
+  captions: false
+  notes: Excerpt 1, page 7. Press Start for the one-minute response period. At 00:00, advance manually. Select AUTO
+    for the next spoken introduction.
+- id: excerpt-2
+  kind: experiment
+  title: Please turn to page 8
+  passage: '2'
+  page: 8
+  body: Listen to the excerpt, then complete your responses.
+  captions: true
+  notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 2; manually select OFF when the
+    orchestra begins. Advance only when the music ends. Booklet focus: loudness; trial run.'
+- id: response-2
+  kind: response
+  title: Complete your responses
+  passage: '2'
+  page: 8
+  body: 'Rate loudness and enjoyment.
+
+    Write 1–2 sentences about your overall impression.'
+  duration: 60
+  captions: false
+  notes: Excerpt 2, page 8. Press Start for the one-minute response period. At 00:00, advance manually. Select AUTO
+    for the next spoken introduction.
+- id: excerpt-3
+  kind: experiment
+  title: Please turn to page 9
+  passage: '3'
+  page: 9
+  body: Listen to the excerpt, then complete your responses.
+  captions: true
+  notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 3; manually select OFF when the
+    orchestra begins. Advance only when the music ends. Booklet focus: clarity.'
+- id: response-3
+  kind: response
+  title: Complete your responses
+  passage: '3'
+  page: 9
+  body: 'Rate clarity and enjoyment.
+
+    Write 1–2 sentences about your overall impression.'
+  duration: 60
+  captions: false
+  notes: Excerpt 3, page 9. Press Start for the one-minute response period. At 00:00, advance manually. Select AUTO
+    for the next spoken introduction.
+- id: excerpt-4
+  kind: experiment
+  title: Please turn to page 10
+  passage: '4'
+  page: 10
+  body: Listen to the excerpt, then complete your responses.
+  captions: true
+  notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 4; manually select OFF when the
+    orchestra begins. Advance only when the music ends. Booklet focus: clarity.'
+- id: response-4
+  kind: response
+  title: Complete your responses
+  passage: '4'
+  page: 10
+  body: 'Rate clarity and enjoyment.
+
+    Write 1–2 sentences about your overall impression.'
+  duration: 60
+  captions: false
+  notes: Excerpt 4, page 10. Press Start for the one-minute response period. At 00:00, advance manually. Select
+    AUTO for the next spoken introduction.
+- id: excerpt-5
+  kind: experiment
+  title: Please turn to page 12
+  passage: '5'
+  page: 12
+  body: Listen to the excerpt, then complete your responses.
+  captions: true
+  notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 5; manually select OFF when the
+    orchestra begins. Advance only when the music ends. Booklet focus: loudness and distortion.'
+- id: response-5
+  kind: response
+  title: Complete your responses
+  passage: '5'
+  page: 12
+  body: 'Rate loudness and distortion and enjoyment.
+
+    Write 1–2 sentences about your overall impression.'
+  duration: 60
+  captions: false
+  notes: Excerpt 5, page 12. Press Start for the one-minute response period. At 00:00, advance manually. Select
+    AUTO for the next spoken introduction.
+- id: excerpt-6
+  kind: experiment
+  title: Please turn to page 14
+  passage: '6'
+  page: 14
+  body: Listen to the excerpt, then complete your responses.
+  captions: true
+  notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 6; manually select OFF when the
+    orchestra begins. Advance only when the music ends. Booklet focus: loudness and distortion.'
+- id: response-6
+  kind: response
+  title: Complete your responses
+  passage: '6'
+  page: 14
+  body: 'Rate loudness and distortion and enjoyment.
+
+    Write 1–2 sentences about your overall impression.'
+  duration: 60
+  captions: false
+  notes: Excerpt 6, page 14. Press Start for the one-minute response period. At 00:00, advance manually. Select
+    AUTO for the next spoken introduction.
+- id: excerpt-7
+  kind: experiment
+  title: Please turn to page 15
+  passage: '7'
+  page: 15
+  body: Listen to the excerpt, then complete your responses.
+  captions: true
+  notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 7; manually select OFF when the
+    orchestra begins. Advance only when the music ends. Booklet focus: frequency balance and harshness.'
+- id: response-7
+  kind: response
+  title: Complete your responses
+  passage: '7'
+  page: 15
+  body: 'Rate frequency balance and harshness and enjoyment.
+
+    Write 1–2 sentences about your overall impression.'
+  duration: 60
+  captions: false
+  notes: Excerpt 7, page 15. Press Start for the one-minute response period. At 00:00, advance manually. Select
+    AUTO for the next spoken introduction.
+- id: excerpt-8
+  kind: experiment
+  title: Please turn to page 16
+  passage: '8'
+  page: 16
+  body: Listen to the excerpt, then complete your responses.
+  captions: true
+  notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 8; manually select OFF when the
+    orchestra begins. Advance only when the music ends. Booklet focus: frequency balance and harshness.'
+- id: response-8
+  kind: response
+  title: Complete your responses
+  passage: '8'
+  page: 16
+  body: 'Rate frequency balance and harshness and enjoyment.
+
+    Write 1–2 sentences about your overall impression.'
+  duration: 60
+  captions: false
+  notes: Excerpt 8, page 16. Press Start for the one-minute response period. At 00:00, advance manually. Select
+    AUTO for the next spoken introduction.
+- id: excerpt-9
+  kind: experiment
+  title: Please turn to page 18
+  passage: '9'
+  page: 18
+  body: Listen to the excerpt, then complete your responses.
+  captions: true
+  notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 9; manually select OFF when the
+    orchestra begins. Advance only when the music ends. Booklet focus: clarity.'
+- id: response-9
+  kind: response
+  title: Complete your responses
+  passage: '9'
+  page: 18
+  body: 'Rate clarity and enjoyment.
+
+    Write 1–2 sentences about your overall impression.'
+  duration: 60
+  captions: false
+  notes: Excerpt 9, page 18. Press Start for the one-minute response period. At 00:00, advance manually. Select
+    AUTO for the next spoken introduction.
+- id: excerpt-10
+  kind: experiment
+  title: Please turn to page 19
+  passage: '10'
+  page: 19
+  body: Listen to the excerpt, then complete your responses.
+  captions: true
+  notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 10; manually select OFF when the
+    orchestra begins. Advance only when the music ends. Booklet focus: clarity.'
+- id: response-10
+  kind: response
+  title: Complete your responses
+  passage: '10'
+  page: 19
+  body: 'Rate clarity and enjoyment.
+
+    Write 1–2 sentences about your overall impression.'
+  duration: 60
+  captions: false
+  notes: Excerpt 10, page 19. Press Start for the one-minute response period. At 00:00, advance manually. Select
+    AUTO for the next spoken introduction.
+- id: ratings-complete
+  kind: closing
+  title: Thank you for your responses
+  body: 'The excerpt-rating activity is complete.
+
+    Please keep your booklet for the next activity.'
+  captions: true
+  notes: Select AUTO for the MC. Close the excerpt-rating experiment, then introduce Movement V and the optional
+    cue-marking task.
+- id: cue-introduction
+  kind: mc
+  title: Optional cue-marking task
+  page: 20
+  body: 'Please turn to page 20 (continued on page 21).
+
+    Note the screen time (MM:SS) when something stands out,
+
+    then describe your experience in a few words.'
+  captions: true
+  notes: 'Select AUTO. Explain that the task is optional: listeners may simply enjoy Movement V. Note positive experiences
+    or perceived issues using approximate screen times. Advance to the timer before the music begins.'
+- id: cue-marking
+  kind: countup
+  title: Cue marking · Movement V
+  page: 20
+  body: 'Optional: note the time and a few words about your experience.
+
+    Continue on page 21 if needed.'
+  captions: false
+  notes: Use AUTO or OFF during music. Press Start at the beginning of Movement V. Stop when the music ends; retain
+    the final elapsed time until ready to close. Timer uses MM:SS.
+- id: final-close
+  kind: closing
+  title: Thank you for taking part
+  body: 'The research activities are complete.
+
+    Questions and discussion with the Cadenza team.'
+  captions: true
+  notes: Select AUTO for closing remarks and Q&A. Give the organisers’ booklet collection instructions.

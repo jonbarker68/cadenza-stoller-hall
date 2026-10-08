@@ -1,6 +1,6 @@
 # Cadenza · Stoller Hall
 
-A standalone macOS presentation app for an operator-led orchestral listening experiment. Two PySide6/QML windows share a YAML-driven sequence. The included programme is an example; passage A, page 3, and all wording must be replaced with the real event content.
+A standalone macOS presentation app for an operator-led orchestral listening experiment. Two PySide6/QML windows share a YAML-driven sequence. The included programme follows the Audience Booklet for the Cadenza–Camerata Research Concert on 29 October 2026.
 
 ## Project layout
 
@@ -64,7 +64,7 @@ uv run cadenza --replay /absolute/path/to/session.jsonl
 
 Edit `config/show.yaml`, or copy it and pass `--show /path/to/programme.yaml`. Each slide needs a unique string `id`, `kind`, and text `title`. Supported kinds: `intro`, `mc`, `experiment`, `music`, `response`, `countup`, `closing`. Optional fields: `body`, `notes` (operator only), `captions` (boolean, default false), `passage`, `page`. Response slides require a positive `duration` in seconds.
 
-The audience view uses the title/body, experiment passage/page, response ring and digital countdown, and caption band. Music slides are presentation states: they do not play audio or cue external equipment. Use short titles/body text and rehearse the actual content on the venue display.
+The audience view uses the title/body, persistent excerpt (`passage`) and booklet `page` labels on every applicable slide, response ring and digital countdown, and a separate caption band. Music slides are presentation states: they do not play audio or cue external equipment. Use short titles/body text and rehearse the actual content on the venue display.
 
 ## Architecture and checks
 
@@ -79,7 +79,7 @@ Live microphone/Speechmatics authentication and a physical second monitor need a
 
 ## Second-section music timer
 
-The `countup` slide type displays a large digital audience timer with captions off in AUTO mode in the example programme. It opens at `00:00` and stays stopped while the MC explains. Press **Start** when the conductor begins; it then counts upwards with no duration limit. Minutes continue past 59 (for example, `60:00`); there is no ring or automatic advancement.
+The `countup` slide type displays a large digital audience timer with captions off in AUTO mode in the supplied programme. It opens at `00:00` and stays stopped while the MC explains. Press **Start** when the conductor begins; it then counts upwards with no duration limit. Minutes continue past 59 (for example, `60:00`); there is no ring or automatic advancement.
 
 The shared **Timer** row controls either timer type. **Start** begins, **Pause** holds, and **Resume** continues the same run. **Stop** holds the final value; the second button then becomes **Restart**, which immediately begins a fresh run from zero (count-up) or the configured duration (countdown). The first button is disabled after Stop or countdown completion. Leaving the slide discards its timer; returning resets it and waits for Start. There is no separate whole-event elapsed timer.
 
@@ -90,3 +90,26 @@ The shared **Timer** row controls either timer type. **Start** begins, **Pause**
   body: Please listen to the orchestra.
   captions: false
 ```
+
+## Booklet-aligned running order
+
+The 25-slide show contains one MC introduction, ten listening/response pairs, an excerpt-rating close, a cue-marking introduction, a cue-marking timer, and a final close. Hold the opening MC slide for the event introduction and Movement I, switching captions OFF during music. Background questionnaire pages 3–4, definitions page 5, and activity instructions page 6 are covered in the MC notes.
+
+| Excerpt | Booklet page | Focus |
+| --- | --- | --- |
+| 1 (trial) | 7 | Loudness |
+| 2 (trial) | 8 | Loudness |
+| 3 | 9 | Clarity |
+| 4 | 10 | Clarity |
+| 5 | 12 | Loudness and distortion |
+| 6 | 14 | Loudness and distortion |
+| 7 | 15 | Frequency balance and harshness |
+| 8 | 16 | Frequency balance and harshness |
+| 9 | 18 | Clarity |
+| 10 | 19 | Clarity |
+
+For each excerpt, select **AUTO** for the spoken introduction, stay on the same listening slide, and manually select **OFF** when the orchestra begins. When the music ends, advance to the response slide and press **Start** for 60 seconds. At zero, advance manually and restore **AUTO** for the next introduction. Overrides persist across navigation; no slide transition changes a manual ON/OFF choice.
+
+Cue marking is optional during Movement V. Introduce page **20**, with continuation on page **21**. Advance to the count-up slide before the music starts, then press **Start** exactly when it begins. The audience records approximate **MM:SS** times and brief experiences. Press **Stop** at the end and advance to the final close when ready. Restore **AUTO** for spoken closing remarks.
+
+Audience styling remains in `src/cadenza/qml/DisplayStyle.qml`; `qmldir` registers the singleton and is included in packaged installations. Live microphone transcription and second-monitor presentation still require a venue rehearsal.
