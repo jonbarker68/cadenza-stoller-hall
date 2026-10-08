@@ -317,13 +317,29 @@ def main():
         help=argparse.SUPPRESS,
     )
 
+    parser.add_argument(
+        '--export-pdf', type=Path, metavar='PATH',
+        help='Export audience slides to a 16:9 PDF and exit (no audio or live captions)',
+    )
+
     args = parser.parse_args()
+    if args.export_pdf and (args.live or args.replay):
+        parser.error('--export-pdf cannot be combined with --live or --replay')
     args.demo = not (args.live or args.replay)
 
     try:
         show = load_show(args.show)
     except (OSError, ValueError, yaml.YAMLError) as exc:
         parser.error(str(exc))
+
+    if args.export_pdf:
+        from .export import export_pdf
+        try:
+            output = export_pdf(show, args.export_pdf)
+        except (OSError, RuntimeError) as exc:
+            parser.exit(1, f'PDF export failed: {exc}\n')
+        print(f"Exported {len(show['slides'])} slides to {output}")
+        return 0
 
     # Native macOS controls can ignore palette overrides in dark mode.
     # Fusion keeps the operator controls consistent with our explicit palette.

@@ -117,3 +117,15 @@ Audience styling remains in `src/cadenza/qml/DisplayStyle.qml`; `qmldir` registe
 ### Arrivals screen
 
 The show opens with the orchestra photograph and event details, using lime and pink accents from the event flier. Leave captions on AUTO while the audience takes their seats; the arrivals slide hides captions. Press Next when the event begins to show the MC introduction with captions enabled. The photograph is bundled in `src/cadenza/qml/assets/orchestra.jpg`. The `arrivals` kind uses `ArrivalsSlide.qml`; its title and repertoire text come from the show YAML.
+
+## Export for feedback
+
+From the project root, export the complete audience slide sequence:
+
+```sh
+uv run cadenza --export-pdf output/cadenza-review.pdf
+```
+
+Use `--show /path/to/show.yaml` to export another programme. The command creates the output directory if needed and replaces an existing PDF only after a successful export. It exits without opening presentation windows, capturing audio, or connecting to transcription.
+
+Each landscape 16:9 page is a 1920×1080 rendering of the actual audience QML, including the arrivals photograph. This preserves the on-screen design; text in the PDF is rasterised rather than selectable. Slides appear in programme order, with countdowns at their starting duration and count-up timers at 00:00. Live captions and operator notes are omitted. This is a static content/design review, not a recording of timer or caption behaviour.
