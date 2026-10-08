@@ -12,25 +12,43 @@ slides:
     body: Your experience is part of the experiment.
     captions: true
     notes: Explain the procedure and response method.
-  - id: experiment-1
-    kind: experiment
-    title: Listening experiment · 01
-    body: Please turn to the passage shown below.
-    passage: A
-    page: 3
+  - id: passage-1
+    kind: mc
+    title: Excerpt 1 · Page 3
+    body: Please turn your booklet to the correct page.
     captions: true
     notes: Example passage and page — replace with the actual programme.
-  - id: music-1
-    kind: music
-    title: A moment to listen
-    body: Please listen to the orchestra.
-    captions: false
-    notes: Cue the musicians. Advance manually when the passage ends.
   - id: response-1
     kind: response
-    title: What did you hear?
+    title: Excerpt 1 · Page 3
     body: Please record your response now.
-    duration: 30
+    duration: 60
+    captions: false
+    notes: Press Start to begin the countdown. At zero, hold until the operator advances.
+  - id: passage-2
+    kind: mc
+    title: Excerpt 2 · Page 4
+    body: Please turn your booklet to the correct page.
+    captions: true
+    notes: Example passage and page — replace with the actual programme.
+  - id: response-2
+    kind: response
+    title: Excerpt 2 · Page 4
+    body: Please record your response now.
+    duration: 60
+    captions: false
+    notes: Press Start to begin the countdown. At zero, hold until the operator advances.
+  - id: passage-3
+    kind: mc
+    title: Excerpt 3 · Page 5
+    body: Please turn your booklet to the correct page.
+    captions: true
+    notes: Example passage and page — replace with the actual programme.
+  - id: response-3
+    kind: response
+    title: Excerpt 3 · Page 5
+    body: Please record your response now.
+    duration: 60
     captions: false
     notes: Press Start to begin the countdown. At zero, hold until the operator advances.
   - id: music-2

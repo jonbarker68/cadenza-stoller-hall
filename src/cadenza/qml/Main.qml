@@ -71,7 +71,7 @@ ApplicationWindow {
     Window {
         id: audience
         title: "Cadenza · Audience"; visible: true; width: 1280; height: 720
-        color: "#101922"
+        color: DisplayStyle.background
         onClosing: audience.hide()
         Slide { anchors.fill: parent }
         Shortcut { sequence: "Escape"; onActivated: { audience.showNormal(); operator.raise(); } }

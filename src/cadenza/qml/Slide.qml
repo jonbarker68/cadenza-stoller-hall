@@ -2,60 +2,147 @@ import QtQuick
 
 Rectangle {
     id: slide
-    color: "#101922"
+    color: DisplayStyle.background
     property var state: controller.state
-    property real scaleUnit: Math.min(width / 1280, height / 720)
-    Rectangle { x: 0; y: 0; width: parent.width; height: 5 * slide.scaleUnit; color: "#d9b679" }
-    Text { x: 70 * slide.scaleUnit; y: 48 * slide.scaleUnit; text: "CADENZA  /  STOLLER HALL"; color: "#d9b679"; font.pixelSize: 18 * slide.scaleUnit; font.letterSpacing: 3 * slide.scaleUnit }
-    Column {
-        x: 70 * slide.scaleUnit; y: 145 * slide.scaleUnit; width: parent.width - 140 * slide.scaleUnit
-        spacing: 24 * slide.scaleUnit
-        Text { width: parent.width; text: slide.state.title; color: "#f5f1e8"; font.pixelSize: 56 * slide.scaleUnit; font.weight: Font.DemiBold; wrapMode: Text.Wrap }
-        Text { width: parent.width; text: slide.state.body; color: "#becad1"; font.pixelSize: 29 * slide.scaleUnit; wrapMode: Text.Wrap }
-        Text { visible: slide.state.kind === "experiment"; text: "PASSAGE " + slide.state.passage + "     ·     PAGE " + slide.state.page; color: "#d9b679"; font.pixelSize: 32 * slide.scaleUnit }
+    property real scaleUnit: Math.min(
+        width / DisplayStyle.referenceWidth,
+        height / DisplayStyle.referenceHeight
+    )
+
+    Rectangle {
+        x: 0
+        y: 0
+        width: parent.width
+        height: DisplayStyle.topRuleHeight * slide.scaleUnit
+        color: DisplayStyle.accent
     }
+
+    Text {
+        x: DisplayStyle.sideMargin * slide.scaleUnit
+        y: DisplayStyle.headerY * slide.scaleUnit
+        text: "CADENZA  /  STOLLER HALL"
+        color: DisplayStyle.accent
+        font.pixelSize: DisplayStyle.headerFontPx * slide.scaleUnit
+        font.letterSpacing: DisplayStyle.headerLetterSpacing * slide.scaleUnit
+    }
+
+    Column {
+        x: DisplayStyle.sideMargin * slide.scaleUnit
+        y: DisplayStyle.contentY * slide.scaleUnit
+        width: parent.width - 2 * DisplayStyle.sideMargin * slide.scaleUnit
+        spacing: DisplayStyle.contentSpacing * slide.scaleUnit
+
+        Text {
+            width: parent.width
+            text: slide.state.title
+            color: DisplayStyle.titleText
+            font.pixelSize: DisplayStyle.titleFontPx * slide.scaleUnit
+            font.weight: Font.DemiBold
+            wrapMode: Text.Wrap
+        }
+
+        Text {
+            width: parent.width
+            text: slide.state.body
+            color: DisplayStyle.bodyText
+            font.pixelSize: DisplayStyle.bodyFontPx * slide.scaleUnit
+            wrapMode: Text.Wrap
+        }
+
+        Text {
+            visible: slide.state.kind === "experiment"
+            text: "PASSAGE " + slide.state.passage + "     ·     PAGE " + slide.state.page
+            color: DisplayStyle.accent
+            font.pixelSize: DisplayStyle.passageFontPx * slide.scaleUnit
+        }
+    }
+
     Text {
         objectName: "musicCountup"
         visible: slide.state.kind === "countup"
         anchors.horizontalCenter: parent.horizontalCenter
-        y: 315 * slide.scaleUnit
-        width: parent.width - 140 * slide.scaleUnit
-        height: 215 * slide.scaleUnit
+        y: DisplayStyle.countupY * slide.scaleUnit
+        width: parent.width - 2 * DisplayStyle.sideMargin * slide.scaleUnit
+        height: DisplayStyle.countupHeight * slide.scaleUnit
         text: slide.state.timerTime
-        color: "#f5f1e8"
-        font.family: "Menlo"
-        font.pixelSize: 180 * slide.scaleUnit
+        color: DisplayStyle.titleText
+        font.family: DisplayStyle.timerFontFamily
+        font.pixelSize: DisplayStyle.countupFontPx * slide.scaleUnit
         font.weight: Font.DemiBold
         fontSizeMode: Text.Fit
-        minimumPixelSize: 12
+        minimumPixelSize: DisplayStyle.minimumFittedFontPx
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
     }
+
     Item {
         visible: slide.state.kind === "response"
-        width: 205 * slide.scaleUnit; height: width
-        anchors.horizontalCenter: parent.horizontalCenter; y: 335 * slide.scaleUnit
+        width: DisplayStyle.responseTimerSize * slide.scaleUnit
+        height: width
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: DisplayStyle.responseTimerY * slide.scaleUnit
+
         Canvas {
-            id: ring; anchors.fill: parent
+            id: ring
+            anchors.fill: parent
             property real fraction: slide.state.fraction
+
             onFractionChanged: requestPaint()
             onWidthChanged: requestPaint()
+
             onPaint: {
-                var ctx = getContext("2d"); ctx.reset();
-                var r = width / 2 - 9 * slide.scaleUnit;
-                ctx.lineWidth = 9 * slide.scaleUnit; ctx.strokeStyle = "#2b3945";
-                ctx.beginPath(); ctx.arc(width/2,height/2,r,0,2*Math.PI); ctx.stroke();
-                ctx.strokeStyle = "#d9b679"; ctx.beginPath(); ctx.arc(width/2,height/2,r,-Math.PI/2,-Math.PI/2+2*Math.PI*fraction); ctx.stroke();
+                var ctx = getContext("2d")
+                ctx.reset()
+                var strokeWidth = DisplayStyle.responseTimerStrokeWidth * slide.scaleUnit
+                var r = width / 2 - strokeWidth
+
+                ctx.lineWidth = strokeWidth
+                ctx.strokeStyle = DisplayStyle.timerTrack
+                ctx.beginPath()
+                ctx.arc(width / 2, height / 2, r, 0, 2 * Math.PI)
+                ctx.stroke()
+
+                ctx.strokeStyle = DisplayStyle.accent
+                ctx.beginPath()
+                ctx.arc(
+                    width / 2,
+                    height / 2,
+                    r,
+                    -Math.PI / 2,
+                    -Math.PI / 2 + 2 * Math.PI * fraction
+                )
+                ctx.stroke()
             }
         }
-        Text { anchors.centerIn: parent; text: slide.state.timerTime; color: "#f5f1e8"; font.pixelSize: 42 * slide.scaleUnit; font.family: "Menlo" }
+
+        Text {
+            anchors.centerIn: parent
+            text: slide.state.timerTime
+            color: DisplayStyle.titleText
+            font.pixelSize: DisplayStyle.responseTimerFontPx * slide.scaleUnit
+            font.family: DisplayStyle.timerFontFamily
+        }
     }
+
     Rectangle {
         visible: slide.state.captions && slide.state.caption.length > 0
-        anchors.bottom: parent.bottom; anchors.bottomMargin: 32 * slide.scaleUnit
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: DisplayStyle.captionBottomMargin * slide.scaleUnit
         anchors.horizontalCenter: parent.horizontalCenter
-        width: parent.width - 100 * slide.scaleUnit; height: captionText.implicitHeight + 24 * slide.scaleUnit
-        color: "#050a0e"; radius: 8 * slide.scaleUnit
-        Text { id: captionText; anchors.centerIn: parent; width: parent.width-36*slide.scaleUnit; text: slide.state.caption; color: "white"; font.pixelSize: 31 * slide.scaleUnit; wrapMode: Text.Wrap; horizontalAlignment: Text.AlignHCenter }
+        width: parent.width - 2 * DisplayStyle.captionSideMargin * slide.scaleUnit
+        height: captionText.implicitHeight + 2 * DisplayStyle.captionPaddingY * slide.scaleUnit
+        color: DisplayStyle.captionBackground
+        radius: DisplayStyle.captionRadius * slide.scaleUnit
+
+        Text {
+            id: captionText
+            anchors.centerIn: parent
+            width: parent.width - 2 * DisplayStyle.captionPaddingX * slide.scaleUnit
+            text: slide.state.caption
+            color: DisplayStyle.captionText
+            font.pixelSize: DisplayStyle.captionFontPx * slide.scaleUnit
+            wrapMode: Text.Wrap
+            horizontalAlignment: Text.AlignHCenter
+        }
     }
 }
