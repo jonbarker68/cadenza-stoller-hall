@@ -151,17 +151,6 @@ Rectangle {
         }
     }
 
-    Text {
-        objectName: "timerLabel"
-        visible: slide.state.kind === "countup"
-        anchors.horizontalCenter: parent.horizontalCenter
-        y: 535 * slide.scaleUnit
-        text: slide.state.kind === "countup" ? "ELAPSED TIME · MM:SS"
-              : (slide.state.timerPhase === "finished" ? "RESPONSE TIME COMPLETE" : "TIME TO RESPOND")
-        color: DisplayStyle.accent
-        font.pixelSize: DisplayStyle.headerFontPx * slide.scaleUnit
-    }
-
     Rectangle {
         objectName: "captionBand"
         visible: slide.state.captions && slide.state.caption.length > 0
