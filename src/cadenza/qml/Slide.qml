@@ -5,6 +5,7 @@ Rectangle {
     objectName: "presentationSlide"
     color: DisplayStyle.background
     property var state: controller.state
+    property bool excerptSlide: state.kind === "experiment" || state.kind === "response" || state.movement.length > 0
     property real scaleUnit: Math.min(
         width / DisplayStyle.referenceWidth,
         height / DisplayStyle.referenceHeight
@@ -26,7 +27,7 @@ Rectangle {
     }
 
     Text {
-        visible: slide.state.kind !== "arrivals"
+        visible: slide.state.kind !== "arrivals" && !slide.excerptSlide
         x: DisplayStyle.sideMargin * slide.scaleUnit
         y: DisplayStyle.headerY * slide.scaleUnit
         text: "CADENZA  /  STOLLER HALL"
@@ -38,12 +39,14 @@ Rectangle {
     Text {
         objectName: "bookletContext"
         x: DisplayStyle.sideMargin * slide.scaleUnit
-        y: 100 * slide.scaleUnit
+        y: (slide.excerptSlide ? 110 : 100) * slide.scaleUnit
         width: parent.width - 2 * x
-        text: (slide.state.passage ? "EXCERPT " + slide.state.passage + "     ·     " : "")
+        text: (slide.state.movement ? "MOVEMENT " + slide.state.movement + "     ·     "
+              : slide.state.passage ? "EXCERPT " + slide.state.passage + "     ·     " : "")
               + (slide.state.page ? "BOOKLET PAGE " + slide.state.page : "")
         color: DisplayStyle.accent
-        font.pixelSize: DisplayStyle.passageFontPx * slide.scaleUnit
+        font.pixelSize: (slide.excerptSlide ? 36 : DisplayStyle.passageFontPx) * slide.scaleUnit
+        horizontalAlignment: slide.excerptSlide ? Text.AlignHCenter : Text.AlignLeft
         font.weight: Font.DemiBold
         textFormat: Text.PlainText
     }
@@ -52,7 +55,7 @@ Rectangle {
         objectName: "instructions"
         visible: slide.state.kind !== "arrivals"
         x: DisplayStyle.sideMargin * slide.scaleUnit
-        y: DisplayStyle.contentY * slide.scaleUnit
+        y: (slide.excerptSlide ? (slide.state.hasTimer ? 205 : 245) : DisplayStyle.contentY) * slide.scaleUnit
         width: parent.width - 2 * DisplayStyle.sideMargin * slide.scaleUnit
         spacing: DisplayStyle.contentSpacing * slide.scaleUnit
 
@@ -61,7 +64,8 @@ Rectangle {
             textFormat: Text.PlainText
             text: slide.state.title
             color: DisplayStyle.titleText
-            font.pixelSize: DisplayStyle.titleFontPx * slide.scaleUnit
+            font.pixelSize: (slide.excerptSlide ? 60 : DisplayStyle.titleFontPx) * slide.scaleUnit
+            horizontalAlignment: slide.excerptSlide ? Text.AlignHCenter : Text.AlignLeft
             font.weight: Font.DemiBold
             wrapMode: Text.Wrap
         }
@@ -69,6 +73,7 @@ Rectangle {
         Text {
             width: parent.width
             textFormat: Text.PlainText
+            visible: slide.state.body.length > 0
             text: slide.state.body
             color: DisplayStyle.bodyText
             font.pixelSize: DisplayStyle.bodyFontPx * slide.scaleUnit
@@ -148,7 +153,7 @@ Rectangle {
 
     Text {
         objectName: "timerLabel"
-        visible: slide.state.hasTimer
+        visible: slide.state.kind === "countup"
         anchors.horizontalCenter: parent.horizontalCenter
         y: 535 * slide.scaleUnit
         text: slide.state.kind === "countup" ? "ELAPSED TIME · MM:SS"

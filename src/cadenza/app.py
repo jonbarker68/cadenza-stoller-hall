@@ -97,6 +97,7 @@ class Controller(QObject):
             kind=s['kind'],
             notes=s.get('notes', ''),
             passage=str(s.get('passage', '')),
+            movement=s.get('movement', ''),
             page=str(s.get('page', '')),
             index=t.index,
             count=len(t.slides),

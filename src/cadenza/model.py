@@ -24,7 +24,7 @@ def load_show(path):
             raise ValueError('Every slide needs a title')
         if not isinstance(slide.get('captions', False), bool):
             raise ValueError('captions must be true or false')
-        for key in ('body', 'notes'):
+        for key in ('body', 'notes', 'movement'):
             if key in slide and not isinstance(slide[key], str):
                 raise ValueError(f'{key} must be text')
         if slide['kind'] == 'response':

@@ -129,3 +129,5 @@ uv run cadenza --export-pdf output/cadenza-review.pdf
 Use `--show /path/to/show.yaml` to export another programme. The command creates the output directory if needed and replaces an existing PDF only after a successful export. It exits without opening presentation windows, capturing audio, or connecting to transcription.
 
 Each landscape 16:9 page is a 1920×1080 rendering of the actual audience QML, including the arrivals photograph. This preserves the on-screen design; text in the PDF is rasterised rather than selectable. Slides appear in programme order, with countdowns at their starting duration and count-up timers at 00:00. Live captions and operator notes are omitted. This is a static content/design review, not a recording of timer or caption behaviour.
+
+Movement V uses the same centred page/instruction layout as the excerpts, with `movement: V` identifying it separately. Optional-task explanations and the page 21 continuation remain in the booklet and host notes.

@@ -26,7 +26,6 @@ slides:
   title: Please turn to page 7
   passage: '1'
   page: 7
-  body: Listen to the excerpt, then complete your responses.
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 1; manually select OFF when the
     orchestra begins. Advance only when the music ends. Booklet focus: loudness; trial run.'
@@ -35,9 +34,6 @@ slides:
   title: Complete your responses
   passage: '1'
   page: 7
-  body: 'Rate loudness and enjoyment.
-
-    Write 1–2 sentences about your overall impression.'
   duration: 60
   captions: false
   notes: Excerpt 1, page 7. Press Start for the one-minute response period. At 00:00, advance manually. Select AUTO
@@ -47,7 +43,6 @@ slides:
   title: Please turn to page 8
   passage: '2'
   page: 8
-  body: Listen to the excerpt, then complete your responses.
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 2; manually select OFF when the
     orchestra begins. Advance only when the music ends. Booklet focus: loudness; trial run.'
@@ -56,9 +51,6 @@ slides:
   title: Complete your responses
   passage: '2'
   page: 8
-  body: 'Rate loudness and enjoyment.
-
-    Write 1–2 sentences about your overall impression.'
   duration: 60
   captions: false
   notes: Excerpt 2, page 8. Press Start for the one-minute response period. At 00:00, advance manually. Select AUTO
@@ -68,7 +60,6 @@ slides:
   title: Please turn to page 9
   passage: '3'
   page: 9
-  body: Listen to the excerpt, then complete your responses.
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 3; manually select OFF when the
     orchestra begins. Advance only when the music ends. Booklet focus: clarity.'
@@ -77,9 +68,6 @@ slides:
   title: Complete your responses
   passage: '3'
   page: 9
-  body: 'Rate clarity and enjoyment.
-
-    Write 1–2 sentences about your overall impression.'
   duration: 60
   captions: false
   notes: Excerpt 3, page 9. Press Start for the one-minute response period. At 00:00, advance manually. Select AUTO
@@ -89,7 +77,6 @@ slides:
   title: Please turn to page 10
   passage: '4'
   page: 10
-  body: Listen to the excerpt, then complete your responses.
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 4; manually select OFF when the
     orchestra begins. Advance only when the music ends. Booklet focus: clarity.'
@@ -98,9 +85,6 @@ slides:
   title: Complete your responses
   passage: '4'
   page: 10
-  body: 'Rate clarity and enjoyment.
-
-    Write 1–2 sentences about your overall impression.'
   duration: 60
   captions: false
   notes: Excerpt 4, page 10. Press Start for the one-minute response period. At 00:00, advance manually. Select
@@ -110,7 +94,6 @@ slides:
   title: Please turn to page 12
   passage: '5'
   page: 12
-  body: Listen to the excerpt, then complete your responses.
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 5; manually select OFF when the
     orchestra begins. Advance only when the music ends. Booklet focus: loudness and distortion.'
@@ -119,9 +102,6 @@ slides:
   title: Complete your responses
   passage: '5'
   page: 12
-  body: 'Rate loudness and distortion and enjoyment.
-
-    Write 1–2 sentences about your overall impression.'
   duration: 60
   captions: false
   notes: Excerpt 5, page 12. Press Start for the one-minute response period. At 00:00, advance manually. Select
@@ -131,7 +111,6 @@ slides:
   title: Please turn to page 14
   passage: '6'
   page: 14
-  body: Listen to the excerpt, then complete your responses.
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 6; manually select OFF when the
     orchestra begins. Advance only when the music ends. Booklet focus: loudness and distortion.'
@@ -140,9 +119,6 @@ slides:
   title: Complete your responses
   passage: '6'
   page: 14
-  body: 'Rate loudness and distortion and enjoyment.
-
-    Write 1–2 sentences about your overall impression.'
   duration: 60
   captions: false
   notes: Excerpt 6, page 14. Press Start for the one-minute response period. At 00:00, advance manually. Select
@@ -152,7 +128,6 @@ slides:
   title: Please turn to page 15
   passage: '7'
   page: 15
-  body: Listen to the excerpt, then complete your responses.
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 7; manually select OFF when the
     orchestra begins. Advance only when the music ends. Booklet focus: frequency balance and harshness.'
@@ -161,9 +136,6 @@ slides:
   title: Complete your responses
   passage: '7'
   page: 15
-  body: 'Rate frequency balance and harshness and enjoyment.
-
-    Write 1–2 sentences about your overall impression.'
   duration: 60
   captions: false
   notes: Excerpt 7, page 15. Press Start for the one-minute response period. At 00:00, advance manually. Select
@@ -173,7 +145,6 @@ slides:
   title: Please turn to page 16
   passage: '8'
   page: 16
-  body: Listen to the excerpt, then complete your responses.
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 8; manually select OFF when the
     orchestra begins. Advance only when the music ends. Booklet focus: frequency balance and harshness.'
@@ -182,9 +153,6 @@ slides:
   title: Complete your responses
   passage: '8'
   page: 16
-  body: 'Rate frequency balance and harshness and enjoyment.
-
-    Write 1–2 sentences about your overall impression.'
   duration: 60
   captions: false
   notes: Excerpt 8, page 16. Press Start for the one-minute response period. At 00:00, advance manually. Select
@@ -194,7 +162,6 @@ slides:
   title: Please turn to page 18
   passage: '9'
   page: 18
-  body: Listen to the excerpt, then complete your responses.
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 9; manually select OFF when the
     orchestra begins. Advance only when the music ends. Booklet focus: clarity.'
@@ -203,9 +170,6 @@ slides:
   title: Complete your responses
   passage: '9'
   page: 18
-  body: 'Rate clarity and enjoyment.
-
-    Write 1–2 sentences about your overall impression.'
   duration: 60
   captions: false
   notes: Excerpt 9, page 18. Press Start for the one-minute response period. At 00:00, advance manually. Select
@@ -215,7 +179,6 @@ slides:
   title: Please turn to page 19
   passage: '10'
   page: 19
-  body: Listen to the excerpt, then complete your responses.
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 10; manually select OFF when the
     orchestra begins. Advance only when the music ends. Booklet focus: clarity.'
@@ -224,9 +187,6 @@ slides:
   title: Complete your responses
   passage: '10'
   page: 19
-  body: 'Rate clarity and enjoyment.
-
-    Write 1–2 sentences about your overall impression.'
   duration: 60
   captions: false
   notes: Excerpt 10, page 19. Press Start for the one-minute response period. At 00:00, advance manually. Select
@@ -242,26 +202,21 @@ slides:
     cue-marking task.
 - id: cue-introduction
   kind: mc
-  title: Optional cue-marking task
+  title: Please turn to page 20
   page: 20
-  body: 'Please turn to page 20 (continued on page 21).
-
-    Note the screen time (MM:SS) when something stands out,
-
-    then describe your experience in a few words.'
   captions: true
   notes: 'Select AUTO. Explain that the task is optional: listeners may simply enjoy Movement V. Note positive experiences
-    or perceived issues using approximate screen times. Advance to the timer before the music begins.'
+    or perceived issues using approximate screen times. Advance to the timer before the music begins. The booklet
+    continues on page 21 if needed.'
+  movement: V
 - id: cue-marking
   kind: countup
-  title: Cue marking · Movement V
+  title: Complete your responses
   page: 20
-  body: 'Optional: note the time and a few words about your experience.
-
-    Continue on page 21 if needed.'
   captions: false
   notes: Use AUTO or OFF during music. Press Start at the beginning of Movement V. Stop when the music ends; retain
     the final elapsed time until ready to close. Timer uses MM:SS.
+  movement: V
 - id: final-close
   kind: closing
   title: Thank you for taking part

@@ -36,10 +36,10 @@ QtObject {
     readonly property string timerFontFamily: "Menlo"
 
     // Response timer
-    readonly property real responseTimerSize: 175
-    readonly property real responseTimerY: 350
+    readonly property real responseTimerSize: 220
+    readonly property real responseTimerY: 315
     readonly property real responseTimerStrokeWidth: 9
-    readonly property real responseTimerFontPx: 44
+    readonly property real responseTimerFontPx: 56
 
     // Captions: a reserved band below slide content and timers.
     readonly property real captionBandHeight: 128
