@@ -128,7 +128,7 @@ uv run cadenza --export-pdf output/cadenza-review.pdf
 
 Use `--show /path/to/show.yaml` to export another programme. The command creates the output directory if needed and replaces an existing PDF only after a successful export. It exits without opening presentation windows, capturing audio, or connecting to transcription.
 
-Each landscape 16:9 page is a 1920×1080 rendering of the actual audience QML, including the arrivals photograph. This preserves the on-screen design; text in the PDF is rasterised rather than selectable. Slides appear in programme order, with countdowns at their starting duration and count-up timers at 00:00. Live captions and operator notes are omitted. This is a static content/design review, not a recording of timer or caption behaviour.
+Each landscape 16:9 page is a 1920×1080 rendering of the actual audience QML, including the arrivals photograph. This preserves the on-screen design; text in the PDF is rasterised rather than selectable. Slides appear in programme order, with countdowns at their starting duration and count-up timers at 00:00. Live captions and operator notes are omitted; use `--pdf-subtitles` below to include sample captions and a region outline. This is a static content/design review, not a recording of timer or caption behaviour.
 
 Movement V uses the same centred page/instruction layout as the excerpts, with `movement: V` identifying it separately. Optional-task explanations and the page 21 continuation remain in the booklet and host notes.
 
@@ -180,3 +180,13 @@ overlay:
 ```
 
 The band remains centred. Width is a fraction of the 1280-wide reference slide canvas, capped by `max_width` in reference pixels, then scaled with the slide. For example, `width_fraction: 0.20` gives a 256-reference-pixel band, minus internal padding for text. Both operator preview and audience display use the same measured wrapping width. If omitted, the existing `DisplayStyle.captionSideMargin` controls width. The cap scales with the presentation; it is not a fixed physical pixel size on every display. Cadenza does not automatically read `~/.config/live-caption/config.yaml`; pass that file explicitly if desired.
+
+### Preview subtitle placement in the review PDF
+
+```sh
+uv run cadenza --export-pdf output/cadenza-subtitle-review.pdf --pdf-subtitles
+```
+
+`--pdf-subtitles` adds static Lorem ipsum sample captions and a pink outline marking the full subtitle region on **every slide**, including arrivals and music slides where AUTO normally hides captions. It uses the actual caption font, padding, two-line wrapping and the width settings in `--caption-config` (default `config/caption-config.yaml`). Scrolling is frozen for the PDF. The outline is a review aid and is not shown in the live presentation.
+
+Omit the switch for the usual export without captions. `--pdf-subtitles` requires `--export-pdf`; audio and live transcription are never started during export.

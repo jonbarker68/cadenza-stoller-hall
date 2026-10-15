@@ -5,7 +5,7 @@ from pathlib import Path
 import tempfile
 
 
-def export_pdf(show, destination):
+def export_pdf(show, destination, *, args=None):
     # Select the headless software renderer before creating any Qt application.
     os.environ['QT_QPA_PLATFORM'] = 'offscreen'
     os.environ['QT_QUICK_BACKEND'] = 'software'
@@ -15,7 +15,12 @@ def export_pdf(show, destination):
     from .app import Controller
 
     app = QGuiApplication([])
-    controller = Controller(show, argparse.Namespace(demo=True))
+    # Carry the same font/layout options and configured width as a live run,
+    # but never launch audio or transcription for an export.
+    options = argparse.Namespace(**vars(args)) if args is not None else argparse.Namespace()
+    options.demo = True
+    preview = bool(getattr(options, 'pdf_subtitles', False))
+    controller = Controller(show, options)
     controller.timer.stop()  # No synthetic captions or advancing timers in the PDF.
     view = QQuickView()
     warnings = []
@@ -43,9 +48,20 @@ def export_pdf(show, destination):
             QPageLayout.Portrait, QMarginsF(0, 0, 0, 0), QPageLayout.Point))
         if not painter.begin(writer):
             raise RuntimeError('Could not initialise PDF output')
+        if preview:
+            if controller.caption_renderer is None or controller.error:
+                raise RuntimeError('Cannot preview subtitles: ' + controller.status)
+            controller.setOverride('ON')
+            controller.caption_scroll_ms = 0
         view.show()
         for index in range(len(show['slides'])):
             controller.move(index - controller.timeline.index)
+            if preview:
+                controller.reset_captions()
+                controller.ingest('final', (
+                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
+                    'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. '
+                ) * 3)
             # Let bindings, image loading, layouts and Canvas painting settle.
             loop = QEventLoop()
             QTimer.singleShot(100, loop.quit)

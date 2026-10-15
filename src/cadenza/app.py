@@ -28,6 +28,7 @@ class Controller(QObject):
         self.caption = ''
         self.final_text = ''
         self.caption_at = 0
+        self.caption_preview = bool(getattr(args, 'pdf_subtitles', False))
         self.caption_renderer = None
         self.caption_layout_key = None
         self.caption_serial = 0
@@ -137,6 +138,7 @@ class Controller(QObject):
             captions=enabled,
             caption=self.caption if enabled else '',
             captionSerial=self.caption_serial,
+            captionPreview=self.caption_preview,
             captionMeasured=self.caption_layout_name == "bbc_live",
             captionWidthFraction=self.caption_width_fraction,
             captionMaxWidth=self.caption_max_width,
@@ -433,6 +435,9 @@ def main():
         help='Export audience slides to a 16:9 PDF and exit (no audio or live captions)',
     )
 
+    parser.add_argument('--pdf-subtitles', action='store_true',
+                        help='Include sample subtitles and a region outline in the PDF (requires --export-pdf)')
+
     parser.add_argument('--log-dir', type=Path, default=Path('logs'),
                         help='Diagnostic log directory (default: logs)')
 
@@ -442,6 +447,8 @@ def main():
     args = parser.parse_args()
     if args.export_pdf and (args.live or args.replay):
         parser.error('--export-pdf cannot be combined with --live or --replay')
+    if args.pdf_subtitles and not args.export_pdf:
+        parser.error('--pdf-subtitles requires --export-pdf')
     args.demo = not (args.live or args.replay)
     args.caption_settings = {}
     if not args.demo or Path(args.caption_config).exists():
@@ -486,7 +493,7 @@ def main():
     if args.export_pdf:
         from .export import export_pdf
         try:
-            output = export_pdf(show, args.export_pdf)
+            output = export_pdf(show, args.export_pdf, args=args)
         except (OSError, RuntimeError) as exc:
             parser.exit(1, f'PDF export failed: {exc}\n')
         print(f"Exported {len(show['slides'])} slides to {output}")

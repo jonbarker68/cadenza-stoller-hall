@@ -21,6 +21,8 @@ Rectangle {
                      2 * lineHeight + 2 * DisplayStyle.captionPaddingY * scaleUnit)
     color: DisplayStyle.captionBackground
     radius: DisplayStyle.captionRadius * scaleUnit
+    border.width: state.captionPreview ? 2 * scaleUnit : 0
+    border.color: "#ef71cf"
 
     Component.onCompleted: {
         controller.configureCaptionLayout(DisplayStyle.captionFontFamily,
