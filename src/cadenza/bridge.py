@@ -3,9 +3,9 @@
 Runs using live-caption's interpreter; never imports its overlay or GUI.
 Stdout is a JSON-lines protocol, with library output redirected to stderr.
 
-Caption transcript rendering is delegated to live-caption's renderer
-implementations so that layouts such as "rolling" and "bbc" behave exactly
-as they do in live-caption.
+With --raw, send partial/final events for measured rendering in the Qt
+presentation process. Without it, retain the rendered-caption protocol for
+older consumers. The native live-caption overlay is never imported.
 """
 
 import contextlib
@@ -18,6 +18,7 @@ import sys
 
 def main():
     root, config_path, replay_path = sys.argv[1:4]
+    raw_output = "--raw" in sys.argv[4:]
     sys.path.insert(0, str(Path(root) / "src"))
 
     protocol = sys.stdout
@@ -46,7 +47,7 @@ def main():
         renderer_config = dict(config)
         renderer_config.update(overlay_config)
 
-        renderer = make_renderer(layout, renderer_config)
+        renderer = None if raw_output else make_renderer(layout, renderer_config)
 
         raw = queue.Queue()
         status = queue.Queue()
@@ -78,7 +79,9 @@ def main():
                         emit(kind, text)
                     break
 
-                if event.kind == "partial":
+                if raw_output:
+                    emit(event.kind, event.text)
+                elif event.kind == "partial":
                     emit(
                         "caption",
                         renderer.update_partial(event.text),

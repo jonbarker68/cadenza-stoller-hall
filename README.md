@@ -68,7 +68,7 @@ The audience view uses the title/body, persistent excerpt (`passage`) and bookle
 
 ## Architecture and checks
 
-`model.py` validates YAML and owns monotonic timers. `app.py` exposes shared state to two QML windows. `bridge.py` runs in a separate process, importing only existing live-caption ASR/config/recording modules, and sends JSON-lines events to the presentation. No existing live-caption files are changed, no overlay UI is loaded, and caption credentials remain in the local configuration or environment. This adapter currently renders raw partial/final transcripts; it does not apply live-caption's optional text-processing filters.
+`model.py` validates YAML and owns monotonic timers. `app.py` exposes shared state to two QML windows. `bridge.py` runs in a separate process, importing only existing live-caption ASR/config/recording modules, and sends JSON-lines events to the presentation. No existing live-caption files are changed, no overlay UI is loaded, and caption credentials remain in the local configuration or environment. The adapter forwards raw partial/final events to the presentation. The Qt process imports only live-caption’s shared renderers, measuring text in the audience font. This path does not apply live-caption’s optional text-processing filters.
 
 ```sh
 PYTHONPATH=src /Users/jon/projects/live-caption/.venv/bin/python -m unittest discover -s tests -v
@@ -139,3 +139,32 @@ Every launch writes timestamped diagnostics to `logs/cadenza.log` and the termin
 Logs include startup paths/mode, slide navigation, caption overrides, source status/errors, full caption-process stderr (including Python tracebacks), process exit codes, Qt messages, and uncaught Python exceptions. The first caption received is recorded as an event without its words. Caption transcripts, audio and complete configuration contents are not deliberately recorded; known configured secrets and common credential patterns are redacted. Third-party diagnostic messages can still contain contextual data, so review logs before sharing.
 
 If captions stop, check the operator status and inspect `logs/cadenza.log` (and `.1` if rotation occurred). A successful audio input check in macOS does not rule out a caption connection or startup error; the log identifies the failing stage.
+
+## Measured live captions and smooth scrolling
+
+Cadenza now defaults to the shared `bbc_live` renderer. Launch using the usual command:
+
+```sh
+uv run cadenza --live --caption-config ./config/caption-config.yaml
+```
+
+The bridge isolates microphone/transcription in its own process and sends raw speech events. Cadenza supplies Qt font measurements to the shared renderer on its GUI thread, then displays the resulting two lines without wrapping or shrinking them again. Operator preview and audience view share a reference caption width, so their line breaks match even at different window sizes. Slide navigation, manual caption overrides and the eight-second idle timeout clear renderer history as well as the visible caption. Hidden speech is not added to the renderer.
+
+Set animation duration in your caption configuration:
+
+```yaml
+overlay:
+  scroll_duration_ms: 180  # set to 0 to disable; accepted range 0–1000 ms
+```
+
+The new-line transition moves upward once; ordinary word updates remain immediate. Corrections and multi-line bursts snap to current text rather than queueing animations. Use `--caption-layout bbc` or `--caption-layout rolling` for the legacy layouts. Cadenza’s CLI layout choice defaults to `bbc_live` and takes precedence over `overlay.layout`, which remains available for the standalone live-caption app.
+
+Audience font settings remain in `src/cadenza/qml/DisplayStyle.qml`: `captionFontFamily` (Arial) and `captionFontPx` (31, unchanged). These are reference pixels for the 1280×720 slide canvas, rather than the standalone overlay’s native macOS font size. Restart after changing them. The caption band expands if necessary to accommodate two lines at the chosen size; rehearse larger settings to check clearance from slide content.
+
+Test without microphone/network access, using the live-caption sample recording:
+
+```sh
+uv run cadenza --replay /Users/jon/projects/live-caption/tests/fixtures/caption-layout.jsonl
+```
+
+Advance past arrivals or select captions ON before the recording begins. A new subprocess GUI regression check exercises measured wrapping, animation/off, history resets, three display sizes and replay through the real caption bridge. No changes to the live-caption project are required by this integration.

@@ -8,7 +8,7 @@ import time
 import yaml
 
 from PySide6.QtCore import QObject, Property, QProcess, QTimer, QUrl, Signal, Slot
-from PySide6.QtGui import QGuiApplication
+from PySide6.QtGui import QGuiApplication, QFont, QFontMetricsF
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuickControls2 import QQuickStyle
 
@@ -28,6 +28,17 @@ class Controller(QObject):
         self.caption = ''
         self.final_text = ''
         self.caption_at = 0
+        self.caption_renderer = None
+        self.caption_layout_key = None
+        self.caption_serial = 0
+        self.caption_scroll = 0
+        self.caption_line_height = 40.0
+        self.caption_settings = getattr(args, 'caption_settings', {})
+        self.caption_layout_name = getattr(args, 'caption_layout', 'bbc_live')
+        self.live_caption_root = Path(getattr(args, 'live_caption', '/Users/jon/projects/live-caption'))
+        self.caption_scroll_ms = float(self.caption_settings.get('overlay', {}).get('scroll_duration_ms', 180))
+        if not math.isfinite(self.caption_scroll_ms) or not 0 <= self.caption_scroll_ms <= 1000:
+            raise ValueError('overlay.scroll_duration_ms must be between 0 and 1000')
         self.status = (
             'Demo captions · no microphone'
             if args.demo
@@ -76,6 +87,7 @@ class Controller(QObject):
                         str(root),
                         config,
                         args.replay or '',
+                        '--raw',
                     ],
                 )
 
@@ -116,6 +128,11 @@ class Controller(QObject):
             ),
             captions=enabled,
             caption=self.caption if enabled else '',
+            captionSerial=self.caption_serial,
+            captionMeasured=self.caption_layout_name == "bbc_live",
+            captionScroll=self.caption_scroll,
+            captionLineHeight=self.caption_line_height,
+            captionScrollMs=self.caption_scroll_ms if self.caption_layout_name == 'bbc_live' else 0,
             override=self.override,
             status=self.status,
             logPath=self.log_path,
@@ -148,11 +165,49 @@ class Controller(QObject):
             timerSecondaryEnabled=t.phase != 'ready',
         )
 
+    def reset_captions(self):
+        self.caption = self.final_text = ''
+        self.caption_scroll = 0
+        self.caption_serial += 1
+        if self.caption_renderer is not None:
+            self.caption_renderer.reset()
+
+    @Slot(str, int, float)
+    def configureCaptionLayout(self, family, pixel_size, width):
+        key = (family, pixel_size, round(width, 3))
+        if key == self.caption_layout_key or width <= 0 or pixel_size <= 0:
+            return
+        try:
+            # Import only the shared pure-Python renderers, never ASR or the
+            # native overlay. Qt measurements remain on the GUI thread.
+            root = str(self.live_caption_root.expanduser().resolve() / 'src')
+            if root not in sys.path:
+                sys.path.insert(0, root)
+            from live_caption.renderers import make_renderer, TextLayout
+            font = QFont(family)
+            font.setPixelSize(pixel_size)
+            metrics = QFontMetricsF(font)
+            config = dict(self.caption_settings)
+            config.update(config.get('overlay', {}))
+            # The audience component reserves exactly two line positions.
+            config['bbc'] = dict(config.get('bbc', {}), lines=2)
+            self.caption_renderer = make_renderer(self.caption_layout_name, config,
+                layout=TextLayout(max(1, width - 2), metrics.horizontalAdvance))
+            self.caption_line_height = math.ceil(metrics.lineSpacing())
+            self.caption_layout_key = key
+            self.reset_captions()
+            logger.info('Caption layout=%s font=%s size=%s width=%s line_height=%s scroll_ms=%s',
+                        self.caption_layout_name, family, pixel_size, width,
+                        self.caption_line_height, self.caption_scroll_ms)
+        except (ImportError, ValueError, TypeError, AttributeError, OSError) as exc:
+            self.ingest('error', 'Caption layout failed: ' + str(exc))
+        self.changed.emit()
+
     @Slot(int)
     def move(self, delta):
         if self.timeline.move(delta):
             logger.info('Slide %s/%s id=%s', self.timeline.index + 1, len(self.timeline.slides), self.timeline.slide.get('id', ''))
-            self.caption = self.final_text = ''
+            self.reset_captions()
         self.changed.emit()
 
     @Slot(str)
@@ -160,7 +215,7 @@ class Controller(QObject):
         if value in ('AUTO', 'ON', 'OFF'):
             logger.info('Caption override: %s', value)
             self.override = value
-            self.caption = self.final_text = ''
+            self.reset_captions()
             self.changed.emit()
 
     @Slot()
@@ -191,21 +246,29 @@ class Controller(QObject):
             # Already-rendered caption state from bridge.py.
             # Replace the current display verbatim; do not accumulate it.
             self.caption = text
+            self.caption_scroll = 0
+            self.caption_serial += 1
             self.caption_at = time.monotonic()
 
         elif kind in ('partial', 'final') and self.state['captions']:
-            # Legacy/raw caption path, retained for demo mode or any source
-            # that still emits unrendered partial/final transcript events.
-            if kind == 'final':
-                self.final_text = (
-                    self.final_text + ' ' + text
-                ).strip()[-240:]
-                self.caption = self.final_text
+            if self.caption_renderer is not None:
+                try:
+                    self.caption = (self.caption_renderer.add_final(text) if kind == 'final'
+                                    else self.caption_renderer.update_partial(text))
+                    self.caption_scroll = getattr(self.caption_renderer, 'scroll_lines', 0)
+                except ValueError as exc:
+                    self.ingest('error', 'Caption layout failed: ' + str(exc))
+                    return
             else:
-                self.caption = (
-                    self.final_text + ' ' + text
-                ).strip()[-240:]
-
+                # Retained for non-GUI consumers. The running QML presentation
+                # configures measured rendering before caption events arrive.
+                if kind == 'final':
+                    self.final_text = (self.final_text + ' ' + text).strip()[-240:]
+                    self.caption = self.final_text
+                else:
+                    self.caption = (self.final_text + ' ' + text).strip()[-240:]
+                self.caption_scroll = 0
+            self.caption_serial += 1
             self.caption_at = time.monotonic()
 
         self.changed.emit()
@@ -288,7 +351,7 @@ class Controller(QObject):
             self.last_demo = now
 
         if self.caption and now - self.caption_at > 8:
-            self.caption = self.final_text = ''
+            self.reset_captions()
 
         self.changed.emit()
 
@@ -363,10 +426,30 @@ def main():
     parser.add_argument('--log-dir', type=Path, default=Path('logs'),
                         help='Diagnostic log directory (default: logs)')
 
+    parser.add_argument('--caption-layout', choices=('bbc_live', 'bbc', 'rolling'), default='bbc_live',
+                        help='Caption layout (default: bbc_live; bbc and rolling are legacy options)')
+
     args = parser.parse_args()
     if args.export_pdf and (args.live or args.replay):
         parser.error('--export-pdf cannot be combined with --live or --replay')
     args.demo = not (args.live or args.replay)
+    args.caption_settings = {}
+    if not args.demo or Path(args.caption_config).exists():
+        try:
+            with open(args.caption_config, encoding='utf-8') as stream:
+                settings = yaml.safe_load(stream) or {}
+            if not isinstance(settings, dict):
+                raise ValueError('Caption configuration must be a mapping')
+            # Do not retain credentials in presentation state.
+            args.caption_settings = {key: settings.get(key, {}) for key in ('overlay', 'bbc')}
+            if not all(isinstance(value, dict) for value in args.caption_settings.values()):
+                raise ValueError('overlay and bbc caption settings must be mappings')
+            duration = float(args.caption_settings['overlay'].get('scroll_duration_ms', 180))
+            if not math.isfinite(duration) or not 0 <= duration <= 1000:
+                raise ValueError('overlay.scroll_duration_ms must be between 0 and 1000')
+        except (OSError, ValueError, TypeError, AttributeError, yaml.YAMLError) as exc:
+            parser.error('Invalid caption configuration: ' + str(exc))
+
     from .diagnostics import configure_logging, configured_secrets
     try:
         args.log_path = configure_logging(args.log_dir, configured_secrets(args.caption_config))

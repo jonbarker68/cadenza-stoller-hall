@@ -47,6 +47,7 @@ QtObject {
     // Captions
     readonly property color captionText: "white"
     readonly property color captionBackground: "#050a0e"
+    readonly property string captionFontFamily: "Arial"
     readonly property real captionFontPx: 31
     readonly property real captionBottomMargin: 24
     readonly property real captionSideMargin: 50

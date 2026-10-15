@@ -151,33 +151,12 @@ Rectangle {
         }
     }
 
-    Rectangle {
+    CaptionBand {
         objectName: "captionBand"
-        visible: slide.state.captions && slide.state.caption.length > 0
+        state: slide.state
+        scaleUnit: slide.scaleUnit
         anchors.bottom: parent.bottom
         anchors.bottomMargin: DisplayStyle.captionBottomMargin * slide.scaleUnit
         anchors.horizontalCenter: parent.horizontalCenter
-        width: parent.width - 2 * DisplayStyle.captionSideMargin * slide.scaleUnit
-        height: DisplayStyle.captionBandHeight * slide.scaleUnit
-        clip: true
-        color: DisplayStyle.captionBackground
-        radius: DisplayStyle.captionRadius * slide.scaleUnit
-
-        Text {
-            id: captionText
-            anchors.centerIn: parent
-            width: parent.width - 2 * DisplayStyle.captionPaddingX * slide.scaleUnit
-            height: parent.height - 2 * DisplayStyle.captionPaddingY * slide.scaleUnit
-            text: slide.state.caption
-            textFormat: Text.PlainText
-            fontSizeMode: Text.Fit
-            minimumPixelSize: Math.max(1, 18 * slide.scaleUnit)
-            elide: Text.ElideRight
-            verticalAlignment: Text.AlignVCenter
-            color: DisplayStyle.captionText
-            font.pixelSize: DisplayStyle.captionFontPx * slide.scaleUnit
-            wrapMode: Text.Wrap
-            horizontalAlignment: Text.AlignHCenter
-        }
     }
 }
