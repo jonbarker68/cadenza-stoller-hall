@@ -91,9 +91,9 @@ slides:
     AUTO for the next spoken introduction.
 - id: excerpt-5
   kind: experiment
-  title: Please turn to page 12
+  title: Please turn to page 11
   passage: '5'
-  page: 12
+  page: 11
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 5; manually select OFF when the
     orchestra begins. Advance only when the music ends. Booklet focus: loudness and distortion.'
@@ -101,16 +101,16 @@ slides:
   kind: response
   title: Complete your responses
   passage: '5'
-  page: 12
+  page: 11
   duration: 60
   captions: false
   notes: Excerpt 5, page 12. Press Start for the one-minute response period. At 00:00, advance manually. Select
     AUTO for the next spoken introduction.
 - id: excerpt-6
   kind: experiment
-  title: Please turn to page 14
+  title: Please turn to page 12
   passage: '6'
-  page: 14
+  page: 12
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 6; manually select OFF when the
     orchestra begins. Advance only when the music ends. Booklet focus: loudness and distortion.'
@@ -118,16 +118,16 @@ slides:
   kind: response
   title: Complete your responses
   passage: '6'
-  page: 14
+  page: 12
   duration: 60
   captions: false
-  notes: Excerpt 6, page 14. Press Start for the one-minute response period. At 00:00, advance manually. Select
+  notes: Excerpt 6, page 12. Press Start for the one-minute response period. At 00:00, advance manually. Select
     AUTO for the next spoken introduction.
 - id: excerpt-7
   kind: experiment
-  title: Please turn to page 15
+  title: Please turn to page 13
   passage: '7'
-  page: 15
+  page: 13
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 7; manually select OFF when the
     orchestra begins. Advance only when the music ends. Booklet focus: frequency balance and harshness.'
@@ -135,16 +135,16 @@ slides:
   kind: response
   title: Complete your responses
   passage: '7'
-  page: 15
+  page: 13
   duration: 60
   captions: false
-  notes: Excerpt 7, page 15. Press Start for the one-minute response period. At 00:00, advance manually. Select
+  notes: Excerpt 7, page 13. Press Start for the one-minute response period. At 00:00, advance manually. Select
     AUTO for the next spoken introduction.
 - id: excerpt-8
   kind: experiment
-  title: Please turn to page 16
+  title: Please turn to page 14
   passage: '8'
-  page: 16
+  page: 14
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 8; manually select OFF when the
     orchestra begins. Advance only when the music ends. Booklet focus: frequency balance and harshness.'
@@ -152,16 +152,16 @@ slides:
   kind: response
   title: Complete your responses
   passage: '8'
-  page: 16
+  page: 14
   duration: 60
   captions: false
-  notes: Excerpt 8, page 16. Press Start for the one-minute response period. At 00:00, advance manually. Select
+  notes: Excerpt 8, page 14. Press Start for the one-minute response period. At 00:00, advance manually. Select
     AUTO for the next spoken introduction.
 - id: excerpt-9
   kind: experiment
-  title: Please turn to page 18
+  title: Please turn to page 15
   passage: '9'
-  page: 18
+  page: 15
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 9; manually select OFF when the
     orchestra begins. Advance only when the music ends. Booklet focus: clarity.'
@@ -169,16 +169,16 @@ slides:
   kind: response
   title: Complete your responses
   passage: '9'
-  page: 18
+  page: 15
   duration: 60
   captions: false
   notes: Excerpt 9, page 18. Press Start for the one-minute response period. At 00:00, advance manually. Select
     AUTO for the next spoken introduction.
 - id: excerpt-10
   kind: experiment
-  title: Please turn to page 19
+  title: Please turn to page 16
   passage: '10'
-  page: 19
+  page: 16
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 10; manually select OFF when the
     orchestra begins. Advance only when the music ends. Booklet focus: clarity.'
@@ -186,10 +186,10 @@ slides:
   kind: response
   title: Complete your responses
   passage: '10'
-  page: 19
+  page: 16
   duration: 60
   captions: false
-  notes: Excerpt 10, page 19. Press Start for the one-minute response period. At 00:00, advance manually. Select
+  notes: Excerpt 10, page 16. Press Start for the one-minute response period. At 00:00, advance manually. Select
     AUTO for the next spoken introduction.
 - id: ratings-complete
   kind: closing
@@ -202,8 +202,8 @@ slides:
     cue-marking task.
 - id: cue-introduction
   kind: mc
-  title: Please turn to page 20
-  page: 20
+  title: Please turn to page 17
+  page: 17
   captions: true
   notes: 'Select AUTO. Explain that the task is optional: listeners may simply enjoy Movement V. Note positive experiences
     or perceived issues using approximate screen times. Advance to the timer before the music begins. The booklet
@@ -212,7 +212,7 @@ slides:
 - id: cue-marking
   kind: countup
   title: Complete your responses
-  page: 20
+  page: 18
   captions: false
   notes: Use AUTO or OFF during music. Press Start at the beginning of Movement V. Stop when the music ends; retain
     the final elapsed time until ready to close. Timer uses MM:SS.
