@@ -18,7 +18,7 @@ import sys
 
 def main():
     root, config_path, replay_path = sys.argv[1:4]
-    sys.path.insert(0, str(Path(root) / "src" / "live_caption"))
+    sys.path.insert(0, str(Path(root) / "src"))
 
     protocol = sys.stdout
 
@@ -29,9 +29,9 @@ def main():
         protocol.flush()
 
     with contextlib.redirect_stdout(sys.stderr):
-        from config import load_config
-        from recording import ReplayWorker
-        from renderers import make_renderer
+        from live_caption.config import load_config
+        from live_caption.recording import ReplayWorker
+        from live_caption.renderers import make_renderer
 
         config = load_config(config_path)
 
@@ -54,7 +54,7 @@ def main():
         if replay_path:
             worker = ReplayWorker(replay_path, raw, status)
         else:
-            from asr import SpeechmaticsWorker
+            from live_caption.asr import SpeechmaticsWorker
 
             worker = SpeechmaticsWorker(raw, status, config)
 

@@ -1,6 +1,7 @@
 import argparse
 import json
 import math
+import logging
 from pathlib import Path
 import sys
 import time
@@ -12,6 +13,8 @@ from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuickControls2 import QQuickStyle
 
 from .model import Timeline, timer_text, load_show
+
+logger = logging.getLogger("cadenza")
 
 
 class Controller(QObject):
@@ -32,6 +35,11 @@ class Controller(QObject):
         )
         self.error = False
         self.buffer = b''
+        self.stderr_buffer = b''
+        self.stderr_tail = ''
+        self.closing = False
+        self.received_caption = False
+        self.log_path = str(getattr(args, 'log_path', ''))
         self.process = None
         self.demo = args.demo
         self.demo_index = 0
@@ -44,9 +52,7 @@ class Controller(QObject):
         if not args.demo:
             self.process = QProcess(self)
             self.process.readyReadStandardOutput.connect(self.read_caption)
-            self.process.readyReadStandardError.connect(
-                lambda: self.process.readAllStandardError()
-            )
+            self.process.readyReadStandardError.connect(self.read_diagnostics)
             self.process.errorOccurred.connect(self.process_error)
             self.process.finished.connect(self.finished)
 
@@ -54,11 +60,13 @@ class Controller(QObject):
             interpreter = root / '.venv/bin/python'
             config = str(Path(args.caption_config).expanduser().resolve())
 
+            logger.info('Caption source: interpreter=%s config=%s mode=%s', interpreter, config, 'replay' if args.replay else 'live')
             if not interpreter.exists():
                 self.status = (
                     'Caption interpreter missing: ' + str(interpreter)
                 )
                 self.error = True
+                logger.error('%s', self.status)
             else:
                 self.status = 'Starting caption source…'
                 self.process.start(
@@ -110,6 +118,8 @@ class Controller(QObject):
             caption=self.caption if enabled else '',
             override=self.override,
             status=self.status,
+            logPath=self.log_path,
+            error=self.error,
             timerTime=display_time,
             fraction=(
                 value / s['duration']
@@ -141,12 +151,14 @@ class Controller(QObject):
     @Slot(int)
     def move(self, delta):
         if self.timeline.move(delta):
+            logger.info('Slide %s/%s id=%s', self.timeline.index + 1, len(self.timeline.slides), self.timeline.slide.get('id', ''))
             self.caption = self.final_text = ''
         self.changed.emit()
 
     @Slot(str)
     def setOverride(self, value):
         if value in ('AUTO', 'ON', 'OFF'):
+            logger.info('Caption override: %s', value)
             self.override = value
             self.caption = self.final_text = ''
             self.changed.emit()
@@ -162,11 +174,17 @@ class Controller(QObject):
         self.changed.emit()
 
     def ingest(self, kind, text):
+        if kind in ('caption', 'partial', 'final') and text and not self.received_caption:
+            self.received_caption = True
+            logger.info('First caption received (transcript omitted)')
         if kind == 'error':
+            logger.error('Caption source: %s', text)
             self.error = True
             self.status = text
 
         elif kind == 'status' and not self.error:
+            if self.status != text:
+                logger.info('Caption status: %s', text)
             self.status = text
 
         elif kind == 'caption' and self.state['captions']:
@@ -212,26 +230,43 @@ class Controller(QObject):
                     'Invalid caption-source message',
                 )
 
+    def read_diagnostics(self, final=False):
+        self.stderr_buffer += bytes(self.process.readAllStandardError())
+        while b'\n' in self.stderr_buffer:
+            line, self.stderr_buffer = self.stderr_buffer.split(b'\n', 1)
+            self.log_diagnostic_line(line)
+        if final and self.stderr_buffer:
+            self.log_diagnostic_line(self.stderr_buffer)
+            self.stderr_buffer = b''
+        elif len(self.stderr_buffer) > 16384:
+            self.log_diagnostic_line(self.stderr_buffer)
+            self.stderr_buffer = b''
+
+    def log_diagnostic_line(self, line):
+        text = line.decode('utf-8', errors='replace').strip()
+        if text:
+            # Keep the complete traceback in the log; show only the last line.
+            logger.warning('Caption stderr: %s', text)
+            self.stderr_tail = text[-400:]
+
     def process_error(self, error):
-        self.ingest(
-            'error',
-            'Caption source failed: '
-            + self.process.errorString(),
-        )
+        if self.closing:
+            return
+        self.read_diagnostics(final=True)
+        detail = ': ' + self.stderr_tail if self.stderr_tail else ''
+        self.ingest('error', 'Caption source failed: ' + self.process.errorString() + detail)
 
     def finished(self, code, status):
         self.read_caption()
-
-        if not self.error:
-            self.status = (
-                'Caption source ended'
-                if code == 0
-                else (
-                    'Caption source failed — check configuration '
-                    'and microphone access'
-                )
-            )
-
+        self.read_diagnostics(final=True)
+        logger.info('Caption process exited: code=%s status=%s requested_shutdown=%s', code, status, self.closing)
+        if not self.closing:
+            if code != 0:
+                detail = self.stderr_tail or 'No diagnostic output; see log for process details'
+                if not self.error:
+                    self.ingest('error', f'Caption source failed (exit {code}): {detail}')
+            elif not self.error:
+                self.status = 'Caption source ended'
         self.changed.emit()
 
     def tick(self):
@@ -258,6 +293,8 @@ class Controller(QObject):
         self.changed.emit()
 
     def close(self):
+        self.closing = True
+        logger.info('Presentation shutting down')
         if (
             self.process
             and self.process.state() != QProcess.NotRunning
@@ -323,14 +360,29 @@ def main():
         help='Export audience slides to a 16:9 PDF and exit (no audio or live captions)',
     )
 
+    parser.add_argument('--log-dir', type=Path, default=Path('logs'),
+                        help='Diagnostic log directory (default: logs)')
+
     args = parser.parse_args()
     if args.export_pdf and (args.live or args.replay):
         parser.error('--export-pdf cannot be combined with --live or --replay')
     args.demo = not (args.live or args.replay)
+    from .diagnostics import configure_logging, configured_secrets
+    try:
+        args.log_path = configure_logging(args.log_dir, configured_secrets(args.caption_config))
+    except OSError as exc:
+        parser.exit(1, f'Cannot open diagnostic log: {exc}. Use --log-dir with a writable directory.\n')
+    logger.info('Starting Cadenza mode=%s show=%s log=%s',
+                'export' if args.export_pdf else 'demo' if args.demo else 'replay' if args.replay else 'live',
+                args.show.resolve(), args.log_path)
+    def report_exception(exc_type, value, traceback):
+        logger.critical('Unhandled application exception', exc_info=(exc_type, value, traceback))
+    sys.excepthook = report_exception
 
     try:
         show = load_show(args.show)
     except (OSError, ValueError, yaml.YAMLError) as exc:
+        logger.exception('Show loading failed')
         parser.error(str(exc))
 
     if args.export_pdf:
@@ -346,6 +398,11 @@ def main():
     # Fusion keeps the operator controls consistent with our explicit palette.
     QQuickStyle.setStyle("Fusion")
 
+    from PySide6.QtCore import qInstallMessageHandler, QtMsgType
+    def qt_message(kind, context, message):
+        level = logging.ERROR if kind in (QtMsgType.QtCriticalMsg, QtMsgType.QtFatalMsg) else logging.WARNING
+        logger.log(level, 'Qt: %s', message)
+    qInstallMessageHandler(qt_message)
     app = QGuiApplication(sys.argv[:1])
     app.setApplicationName(
         'Cadenza · Stoller Hall'

@@ -131,3 +131,11 @@ Use `--show /path/to/show.yaml` to export another programme. The command creates
 Each landscape 16:9 page is a 1920×1080 rendering of the actual audience QML, including the arrivals photograph. This preserves the on-screen design; text in the PDF is rasterised rather than selectable. Slides appear in programme order, with countdowns at their starting duration and count-up timers at 00:00. Live captions and operator notes are omitted. This is a static content/design review, not a recording of timer or caption behaviour.
 
 Movement V uses the same centred page/instruction layout as the excerpts, with `movement: V` identifying it separately. Optional-task explanations and the page 21 continuation remain in the booklet and host notes.
+
+## Diagnosing problems on the day
+
+Every launch writes timestamped diagnostics to `logs/cadenza.log` and the terminal. The operator window shows the absolute log path; errors appear in red with the specific caption error when available. Use `--log-dir /path/to/logs` to choose another writable location. Logs rotate at 2 MB with three backups (`cadenza.log.1` through `.3`).
+
+Logs include startup paths/mode, slide navigation, caption overrides, source status/errors, full caption-process stderr (including Python tracebacks), process exit codes, Qt messages, and uncaught Python exceptions. The first caption received is recorded as an event without its words. Caption transcripts, audio and complete configuration contents are not deliberately recorded; known configured secrets and common credential patterns are redacted. Third-party diagnostic messages can still contain contextual data, so review logs before sharing.
+
+If captions stop, check the operator status and inspect `logs/cadenza.log` (and `.1` if rotation occurred). A successful audio input check in macOS does not rule out a caption connection or startup error; the log identifies the failing stage.

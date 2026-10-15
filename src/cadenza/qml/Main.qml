@@ -66,7 +66,8 @@ ApplicationWindow {
             Button { text: "Present full screen"; onClicked: { audience.screen = Qt.application.screens[screens.currentIndex]; audience.showFullScreen(); } }
             Button { text: "Windowed"; onClicked: { audience.showNormal(); audience.raise(); operator.raise(); } }
         }
-        Label { text: operator.s.status; wrapMode: Text.Wrap; Layout.fillWidth: true; color: "#40576a" }
+        Label { text: operator.s.status; wrapMode: Text.Wrap; Layout.fillWidth: true; color: operator.s.error ? "#a12424" : "#40576a" }
+        Label { text: "Log: " + operator.s.logPath; visible: operator.s.logPath.length > 0; font.pixelSize: 12; Layout.fillWidth: true; elide: Text.ElideMiddle }
     }
     Window {
         id: audience
