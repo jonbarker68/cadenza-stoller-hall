@@ -168,3 +168,15 @@ uv run cadenza --replay /Users/jon/projects/live-caption/tests/fixtures/caption-
 ```
 
 Advance past arrivals or select captions ON before the recording begins. A new subprocess GUI regression check exercises measured wrapping, animation/off, history resets, three display sizes and replay through the real caption bridge. No changes to the live-caption project are required by this integration.
+
+### Caption region width in Cadenza
+
+Cadenza reads `overlay.width_fraction` and `overlay.max_width` from the file passed with `--caption-config` (default `config/caption-config.yaml`). Restart after changing them:
+
+```yaml
+overlay:
+  width_fraction: 0.60
+  max_width: 900
+```
+
+The band remains centred. Width is a fraction of the 1280-wide reference slide canvas, capped by `max_width` in reference pixels, then scaled with the slide. For example, `width_fraction: 0.20` gives a 256-reference-pixel band, minus internal padding for text. Both operator preview and audience display use the same measured wrapping width. If omitted, the existing `DisplayStyle.captionSideMargin` controls width. The cap scales with the presentation; it is not a fixed physical pixel size on every display. Cadenza does not automatically read `~/.config/live-caption/config.yaml`; pass that file explicitly if desired.

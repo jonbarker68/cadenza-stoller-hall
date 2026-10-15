@@ -4,8 +4,11 @@ Rectangle {
     id: band
     property var state
     property real scaleUnit: 1
-    property real textWidthRef: DisplayStyle.referenceWidth - 2 * DisplayStyle.captionSideMargin
-                                - 2 * DisplayStyle.captionPaddingX
+    property real regionWidthRef: Math.min(
+        state.captionWidthFraction > 0 ? DisplayStyle.referenceWidth * state.captionWidthFraction
+                                       : DisplayStyle.referenceWidth - 2 * DisplayStyle.captionSideMargin,
+        state.captionMaxWidth > 0 ? state.captionMaxWidth : DisplayStyle.referenceWidth)
+    property real textWidthRef: Math.max(1, regionWidthRef - 2 * DisplayStyle.captionPaddingX)
     property real lineHeight: state.captionLineHeight * scaleUnit
     property int seenSerial: -1
     property string targetText: ""
@@ -13,7 +16,7 @@ Rectangle {
     property string displayText: ""
 
     visible: state.captions && state.caption.length > 0
-    width: (DisplayStyle.referenceWidth - 2 * DisplayStyle.captionSideMargin) * scaleUnit
+    width: regionWidthRef * scaleUnit
     height: Math.max(DisplayStyle.captionBandHeight * scaleUnit,
                      2 * lineHeight + 2 * DisplayStyle.captionPaddingY * scaleUnit)
     color: DisplayStyle.captionBackground

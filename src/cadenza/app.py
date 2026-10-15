@@ -36,6 +36,14 @@ class Controller(QObject):
         self.caption_settings = getattr(args, 'caption_settings', {})
         self.caption_layout_name = getattr(args, 'caption_layout', 'bbc_live')
         self.live_caption_root = Path(getattr(args, 'live_caption', '/Users/jon/projects/live-caption'))
+        overlay_settings = self.caption_settings.get('overlay', {})
+        self.caption_width_fraction = float(overlay_settings.get('width_fraction', 0))
+        self.caption_max_width = float(overlay_settings.get('max_width', 0))
+        for key, value in (('width_fraction', self.caption_width_fraction), ('max_width', self.caption_max_width)):
+            if not math.isfinite(value) or value < 0 or (key in overlay_settings and value == 0):
+                raise ValueError(f'overlay.{key} must be positive and finite')
+        if self.caption_width_fraction > 1:
+            raise ValueError('overlay.width_fraction must not exceed 1')
         self.caption_scroll_ms = float(self.caption_settings.get('overlay', {}).get('scroll_duration_ms', 180))
         if not math.isfinite(self.caption_scroll_ms) or not 0 <= self.caption_scroll_ms <= 1000:
             raise ValueError('overlay.scroll_duration_ms must be between 0 and 1000')
@@ -130,6 +138,8 @@ class Controller(QObject):
             caption=self.caption if enabled else '',
             captionSerial=self.caption_serial,
             captionMeasured=self.caption_layout_name == "bbc_live",
+            captionWidthFraction=self.caption_width_fraction,
+            captionMaxWidth=self.caption_max_width,
             captionScroll=self.caption_scroll,
             captionLineHeight=self.caption_line_height,
             captionScrollMs=self.caption_scroll_ms if self.caption_layout_name == 'bbc_live' else 0,
@@ -444,6 +454,11 @@ def main():
             args.caption_settings = {key: settings.get(key, {}) for key in ('overlay', 'bbc')}
             if not all(isinstance(value, dict) for value in args.caption_settings.values()):
                 raise ValueError('overlay and bbc caption settings must be mappings')
+            for key in ('width_fraction', 'max_width'):
+                if key in args.caption_settings['overlay']:
+                    width_value = float(args.caption_settings['overlay'][key])
+                    if not math.isfinite(width_value) or width_value <= 0 or (key == 'width_fraction' and width_value > 1):
+                        raise ValueError(f'overlay.{key} must be positive and finite (width_fraction at most 1)')
             duration = float(args.caption_settings['overlay'].get('scroll_duration_ms', 180))
             if not math.isfinite(duration) or not 0 <= duration <= 1000:
                 raise ValueError('overlay.scroll_duration_ms must be between 0 and 1000')

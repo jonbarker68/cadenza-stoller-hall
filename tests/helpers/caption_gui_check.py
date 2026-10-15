@@ -122,6 +122,24 @@ with tempfile.TemporaryDirectory() as directory:
     loop.exec()
     assert not c2.error, c2.status
     assert c2.caption == 'Test phrase from the bridge.', c2.caption
+    # User-supplied region width must reach the actual QML band and metrics.
+    c2.caption_width_fraction = .20
+    c2.caption_max_width = 900
+    engine2 = QQmlApplicationEngine()
+    engine2.rootContext().setContextProperty('controller', c2)
+    engine2.load(QUrl.fromLocalFile(str(project / 'src/cadenza/qml/Main.qml')))
+    wait(50)
+    root2 = engine2.rootObjects()[0]
+    narrow_band = root2.findChild(QObject, 'captionBand')
+    assert narrow_band.property('regionWidthRef') == 256
+    assert narrow_band.property('textWidthRef') == 220
+    assert c2.caption_renderer.layout.width == 218
+    c2.reset_captions()
+    c2.ingest('final', 'A narrow caption region wraps text at the configured width.')
+    for line in c2.caption.splitlines():
+        assert c2.caption_renderer.layout.fits(line)
+    engine2.deleteLater()
+    QCoreApplication.sendPostedEvents(None, QEvent.DeferredDelete)
     c2.timer.stop()
     c2.close()
 print('PASS: measured Qt layout, scrolling, off switch, resets, 3 resolutions and raw bridge replay')
