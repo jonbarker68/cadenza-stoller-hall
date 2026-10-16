@@ -122,7 +122,10 @@ class Controller(QObject):
 
         return dict(
             title=s['title'],
+            layout=s.get('layout', ''),
             body=s.get('body', ''),
+            subtitle=s.get('subtitle', ''),
+            style=s.get('style', {}),
             kind=s['kind'],
             notes=s.get('notes', ''),
             passage=str(s.get('passage', '')),

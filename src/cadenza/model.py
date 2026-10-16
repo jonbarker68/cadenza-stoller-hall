@@ -6,6 +6,40 @@ import yaml
 KINDS = {'arrivals', 'intro', 'mc', 'experiment', 'music', 'response', 'countup', 'closing'}
 
 
+def validate_slide_style(style):
+    """Validate the optional standard-slide presentation controls."""
+    if not isinstance(style, dict):
+        raise ValueError('style must be a mapping')
+    allowed = {'alignment', 'content_y', 'side_margin', 'spacing', 'title', 'body', 'subtitle'}
+    if set(style) - allowed:
+        raise ValueError('Unknown style option: ' + ', '.join(sorted(set(style) - allowed)))
+    if 'alignment' in style and style['alignment'] not in ('left', 'center', 'right'):
+        raise ValueError('style.alignment must be left, center or right')
+    def number(value, name, positive=False):
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or (value <= 0 if positive else value < 0):
+            raise ValueError(f'{name} must be a finite ' + ('positive' if positive else 'non-negative') + ' number')
+    for key in ('content_y', 'side_margin', 'spacing'):
+        if key in style:
+            number(style[key], 'style.' + key)
+    if style.get('side_margin', 0) >= 640:
+        raise ValueError('style.side_margin must be less than 640 reference pixels')
+    for role in ('title', 'body', 'subtitle'):
+        if role not in style:
+            continue
+        values = style[role]
+        if not isinstance(values, dict):
+            raise ValueError(f'style.{role} must be a mapping')
+        if set(values) - {'font_size', 'bold', 'italic', 'font_family'}:
+            raise ValueError(f'Unknown style.{role} font option')
+        if 'font_size' in values:
+            number(values['font_size'], f'style.{role}.font_size', positive=True)
+        for key in ('bold', 'italic'):
+            if key in values and not isinstance(values[key], bool):
+                raise ValueError(f'style.{role}.{key} must be true or false')
+        if 'font_family' in values and (not isinstance(values['font_family'], str) or not values['font_family'].strip()):
+            raise ValueError(f'style.{role}.font_family must be non-empty text')
+
+
 def load_show(path):
     with open(path, encoding='utf-8') as stream:
         show = yaml.safe_load(stream)
@@ -24,9 +58,11 @@ def load_show(path):
             raise ValueError('Every slide needs a title')
         if not isinstance(slide.get('captions', False), bool):
             raise ValueError('captions must be true or false')
-        for key in ('body', 'notes', 'movement'):
+        for key in ('body', 'subtitle', 'notes', 'movement'):
             if key in slide and not isinstance(slide[key], str):
                 raise ValueError(f'{key} must be text')
+        if 'style' in slide:
+            validate_slide_style(slide['style'])
         if slide['kind'] == 'response':
             duration = slide.get('duration')
             if isinstance(duration, bool) or not isinstance(duration, (int, float)) or not math.isfinite(duration) or duration <= 0:

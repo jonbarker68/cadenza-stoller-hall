@@ -11,16 +11,50 @@ slides:
   notes: Display while the audience arrives and takes their seats. Keep captions on AUTO (hidden on this slide).
     Advance once when the event begins to show the existing MC introduction; captions then appear automatically.
 - id: mc-introduction
+  layout: welcome
   kind: mc
-  title: Welcome to the research concert
-  body: 'Cadenza and Manchester Camerata
-
-    Listening together at Stoller Hall'
+  title: Welcome to the Cadenza Camerata Research Concert
+  body: 'Introduction from Dr Alinka Greasly, University of Leeds'
   captions: true
   notes: 'Select AUTO for captions. Introduce the event and voluntary participation. Background questionnaire: pages
     3–4; definitions: page 5; research instructions: page 6. Hold here for Movement I, manually selecting OFF during
     music, then AUTO for the research introduction. Explain the ten excerpts in pairs, the first two trial runs,
     and one minute to respond after each. There are no right or wrong answers.'
+- id: gabor-takacs-nagy
+  kind: mc
+  title: Beethoven at the time of writing Symphony 6 
+  body: 'Gábor Takács-Nagy'
+  subtitle: Conductor of the Manchester Camerata
+  style:
+    alignment: center
+    spacing: 22
+    body:
+      font_size: 64
+      bold: true
+    subtitle:
+      font_size: 30
+      italic: true
+  captions: true
+  notes: 'Select AUTO for captions. Introduce the event and voluntary participation. Background questionnaire: pages
+    3–4; definitions: page 5; research instructions: page 6. Hold here for Movement I, manually selecting OFF during
+    music, then AUTO for the research introduction. Explain the ten excerpts in pairs, the first two trial runs,
+    and one minute to respond after each. There are no right or wrong answers.'
+- id: movement-i
+  kind: mc
+  title: Movement I 
+  body: 'Just sit back and enjoy!' 
+  captions: false
+  notes: ''
+- id: activity-introduction
+  kind: mc
+  title: Research activity
+  body: |
+  
+    • 10 excerpts, played in pairs (1+2, 3+4, 5+6, etc.).
+
+    • Excerpts 1 and 2 are trials to help you familiarise yourself with the response format.
+  captions: false
+  notes: ''
 - id: excerpt-1
   kind: experiment
   title: Please turn to page 7

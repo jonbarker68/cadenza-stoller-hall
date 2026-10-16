@@ -190,3 +190,33 @@ uv run cadenza --export-pdf output/cadenza-subtitle-review.pdf --pdf-subtitles
 `--pdf-subtitles` adds static Lorem ipsum sample captions and a pink outline marking the full subtitle region on **every slide**, including arrivals and music slides where AUTO normally hides captions. It uses the actual caption font, padding, two-line wrapping and the width settings in `--caption-config` (default `config/caption-config.yaml`). Scrolling is frozen for the PDF. The outline is a review aid and is not shown in the live presentation.
 
 Omit the switch for the usual export without captions. `--pdf-subtitles` requires `--export-pdf`; audio and live transcription are never started during export.
+
+## Welcome slide logos
+
+The `mc-introduction` slide uses `layout: welcome`. `WelcomeSlide.qml` displays its existing title and body, followed by authentic Cadenza/Camerata, university organiser, and EPSRC funder logos. Other slides retain their existing layout. The logo panel ends above the reserved caption area. Artwork is bundled locally (including packaged installs), so the welcome slide needs no network connection. Sources are recorded in `src/cadenza/qml/assets/logos/SOURCES.json`; original colours and aspect ratios are retained.
+
+## Per-slide typography and layout
+
+Standard text slides accept an optional `subtitle` (below the body) and a `style` mapping. Plain text stays separate from presentation; HTML markup is not needed. Existing slides keep their defaults when options are omitted. For example:
+
+```yaml
+- id: gabor-takacs-nagy
+  kind: mc
+  title: Beethoven at the time of writing Symphony 6
+  body: Gábor Takács-Nagy
+  subtitle: Conductor of the Manchester Camerata
+  captions: true
+  style:
+    alignment: center
+    spacing: 22
+    body:
+      font_size: 64
+      bold: true
+    subtitle:
+      font_size: 30
+      italic: true
+```
+
+`style.title`, `style.body` and `style.subtitle` each support `font_size`, `bold`, `italic` and `font_family`. The outer style supports `alignment` (`left`, `center`, `right`), `spacing` (between visible text blocks), `content_y` (top of the text column), and `side_margin` (left/right margin, below 640). All sizes and distances are reference pixels on the 1280×720 canvas and scale with the slide; they are not PowerPoint points. Unknown options or invalid types fail at show loading with an error.
+
+These controls affect the standard text column, including excerpt slides; they do not reposition booklet labels, timers or captions. Arrivals and the logo welcome slide use dedicated layouts with their own geometry. Keep those as reusable templates; add further named layouts when a slide needs a different structure rather than accumulating arbitrary coordinates. Preview larger text with `--export-pdf ... --pdf-subtitles` to check that it clears timers and captions.

@@ -6,6 +6,13 @@ Rectangle {
     color: DisplayStyle.background
     property var state: controller.state
     property bool excerptSlide: state.kind === "experiment" || state.kind === "response" || state.movement.length > 0
+    property int contentAlignment: state.style.alignment === "center" ? Text.AlignHCenter
+                                   : state.style.alignment === "right" ? Text.AlignRight
+                                   : state.style.alignment === "left" ? Text.AlignLeft
+                                   : excerptSlide ? Text.AlignHCenter : Text.AlignLeft
+    property real contentSideMargin: state.style.side_margin !== undefined
+                                     ? state.style.side_margin : DisplayStyle.sideMargin
+
     property real scaleUnit: Math.min(
         width / DisplayStyle.referenceWidth,
         height / DisplayStyle.referenceHeight
@@ -15,6 +22,13 @@ Rectangle {
         anchors.fill: parent
         visible: slide.state.kind === "arrivals"
         state: slide.state
+    }
+
+    WelcomeSlide {
+        anchors.fill: parent
+        visible: slide.state.layout === "welcome"
+        state: slide.state
+        scaleUnit: slide.scaleUnit
     }
 
     Rectangle {
@@ -53,34 +67,46 @@ Rectangle {
 
     Column {
         objectName: "instructions"
-        visible: slide.state.kind !== "arrivals"
-        x: DisplayStyle.sideMargin * slide.scaleUnit
-        y: (slide.excerptSlide ? (slide.state.hasTimer ? 205 : 245) : DisplayStyle.contentY) * slide.scaleUnit
-        width: parent.width - 2 * DisplayStyle.sideMargin * slide.scaleUnit
-        spacing: DisplayStyle.contentSpacing * slide.scaleUnit
+        visible: slide.state.kind !== "arrivals" && slide.state.layout !== "welcome"
+        x: slide.contentSideMargin * slide.scaleUnit
+        y: (slide.state.style.content_y !== undefined ? slide.state.style.content_y
+            : slide.excerptSlide ? (slide.state.hasTimer ? 205 : 245) : DisplayStyle.contentY) * slide.scaleUnit
+        width: parent.width - 2 * slide.contentSideMargin * slide.scaleUnit
+        spacing: (slide.state.style.spacing !== undefined ? slide.state.style.spacing : DisplayStyle.contentSpacing) * slide.scaleUnit
 
-        Text {
+        SlideText {
+            objectName: "slideTitle"
             width: parent.width
-            textFormat: Text.PlainText
             text: slide.state.title
+            appearance: slide.state.style.title || ({})
+            scaleUnit: slide.scaleUnit
+            defaultFontPx: slide.excerptSlide ? 60 : DisplayStyle.titleFontPx
+            defaultWeight: Font.DemiBold
             color: DisplayStyle.titleText
-            font.pixelSize: (slide.excerptSlide ? 60 : DisplayStyle.titleFontPx) * slide.scaleUnit
-            horizontalAlignment: slide.excerptSlide ? Text.AlignHCenter : Text.AlignLeft
-            font.weight: Font.DemiBold
-            wrapMode: Text.Wrap
+            horizontalAlignment: slide.contentAlignment
         }
-
-        Text {
+        SlideText {
+            objectName: "slideBody"
             width: parent.width
-            textFormat: Text.PlainText
-            visible: slide.state.body.length > 0
+            visible: text.length > 0
             text: slide.state.body
+            appearance: slide.state.style.body || ({})
+            scaleUnit: slide.scaleUnit
+            defaultFontPx: DisplayStyle.bodyFontPx
             color: DisplayStyle.bodyText
-            font.pixelSize: DisplayStyle.bodyFontPx * slide.scaleUnit
-            wrapMode: Text.Wrap
+            horizontalAlignment: slide.contentAlignment
         }
-
-
+        SlideText {
+            objectName: "slideSubtitle"
+            width: parent.width
+            visible: text.length > 0
+            text: slide.state.subtitle
+            appearance: slide.state.style.subtitle || ({})
+            scaleUnit: slide.scaleUnit
+            defaultFontPx: DisplayStyle.bodyFontPx
+            color: DisplayStyle.bodyText
+            horizontalAlignment: slide.contentAlignment
+        }
     }
 
     Text {
