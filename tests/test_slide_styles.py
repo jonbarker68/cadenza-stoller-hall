@@ -29,7 +29,7 @@ class SlideStyleTests(unittest.TestCase):
 import argparse
 from pathlib import Path
 from PySide6.QtCore import QCoreApplication,QEvent,QEventLoop,QObject,QPointF,QTimer,QUrl
-from PySide6.QtGui import QGuiApplication
+from PySide6.QtGui import QGuiApplication,QFontInfo,QFontMetricsF,QFont
 from PySide6.QtQml import QQmlExpression
 from PySide6.QtQuick import QQuickView
 from cadenza.app import Controller
@@ -62,11 +62,18 @@ for width,height in ((1920,1080),(1024,768),(1280,720)):
     assert QQmlExpression(view.rootContext(),body,'horizontalAlignment === 4').evaluate()[0]
 view.grabWindow().save('/tmp/cadenza-gabor-style.png')
 # Omitted styles preserve the normal MC font sizes.
-c.timeline.slides.append({'id':'default','kind':'mc','title':'Default','body':'Body'})
+c.timeline.slides.append({'id':'default','kind':'mc','title':'Default','body':'Just sit back and enjoy!'})
 c.move(len(c.timeline.slides));wait()
 root=view.rootObject()
 assert root.findChild(QObject,'slideTitle').property('font').pixelSize()==48
 assert root.findChild(QObject,'slideBody').property('font').pixelSize()==29
+body=root.findChild(QObject,'slideBody')
+font=body.property('font')
+assert font.family()==app.font().family(),repr(font.family())
+assert 'emoji' not in QFontInfo(font).family().lower()
+expected=QFont(app.font());expected.setPixelSize(29)
+assert abs(body.property('contentWidth')-QFontMetricsF(expected).horizontalAdvance(body.property('text'))) < 1
+
 assert not root.findChild(QObject,'slideSubtitle').isVisible()
 assert not errors,errors
 view.close();view.deleteLater();QCoreApplication.sendPostedEvents(None,QEvent.DeferredDelete);c.close()

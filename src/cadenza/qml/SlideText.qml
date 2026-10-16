@@ -10,5 +10,5 @@ Text {
     font.pixelSize: (appearance.font_size !== undefined ? appearance.font_size : defaultFontPx) * scaleUnit
     font.weight: appearance.bold !== undefined ? (appearance.bold ? Font.Bold : Font.Normal) : defaultWeight
     font.italic: appearance.italic !== undefined ? appearance.italic : false
-    font.family: appearance.font_family !== undefined ? appearance.font_family : ""
+    font.family: appearance.font_family !== undefined ? appearance.font_family : Qt.application.font.family
 }

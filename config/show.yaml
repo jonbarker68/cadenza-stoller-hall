@@ -49,7 +49,7 @@ slides:
   kind: mc
   title: Research activity
   body: |
-  
+
     • 10 excerpts, played in pairs (1+2, 3+4, 5+6, etc.).
 
     • Excerpts 1 and 2 are trials to help you familiarise yourself with the response format.
@@ -254,8 +254,6 @@ slides:
 - id: final-close
   kind: closing
   title: Thank you for taking part
-  body: 'The research activities are complete.
-
-    Questions and discussion with the Cadenza team.'
+  body: 'The research activities are complete.'
   captions: true
   notes: Select AUTO for closing remarks and Q&A. Give the organisers’ booklet collection instructions.
