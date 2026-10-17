@@ -58,6 +58,30 @@ for line in c.caption.splitlines():
     assert c.caption_renderer.layout.fits(line)
 assert text.property('font').pixelSize() == 31
 
+# Shared pause breaks apply with Qt font measurements, including animation.
+clock = [0.0]
+original_clock = c.caption_renderer._clock
+c.caption_renderer._clock = lambda: clock[0]
+c.reset_captions()
+c.ingest('final', 'Hi.')
+clock[0] = 3.0
+c.ingest('partial', 'Welcome')
+assert c.caption == 'Hi.\nWelcome', c.caption
+c.ingest('final', 'Welcome')
+assert c.caption == 'Hi.\nWelcome', c.caption
+clock[0] = 6.0
+c.ingest('partial', 'Next')
+assert c.caption == 'Welcome\nNext', c.caption
+assert c.caption_scroll == 1
+wait(60)
+assert animation.property('running')
+c.ingest('final', 'Next')
+assert c.caption_scroll == 0
+wait(180)
+assert band.property('displayText') == 'Welcome\nNext'
+c.caption_renderer._clock = original_clock
+c.reset_captions()
+
 # OFF and slide changes reset renderer history as well as visible text.
 c.setOverride('OFF')
 c.ingest('final', 'HIDDEN MUSIC WORDS')
