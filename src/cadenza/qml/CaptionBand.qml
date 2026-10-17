@@ -14,6 +14,9 @@ Rectangle {
     property string targetText: ""
     property string outgoing: ""
     property string displayText: ""
+    property var targetHtmlLines: []
+    property string outgoingHtml: ""
+    property string displayHtml: ""
 
     visible: state.captions && state.caption.length > 0
     width: regionWidthRef * scaleUnit
@@ -35,6 +38,8 @@ Rectangle {
         scroll.stop()
         targetText = text
         displayText = text
+        targetHtmlLines = state.captionHtmlLines || []
+        displayHtml = targetHtmlLines.join("<br/>")
         captionText.y = 0
     }
     function updateCaption() {
@@ -50,6 +55,8 @@ Rectangle {
             if (!state.captionScroll && targetText.split("\n")[0] === text.split("\n")[0]) {
                 targetText = text
                 displayText = outgoing + "\n" + text
+                targetHtmlLines = state.captionHtmlLines || []
+                displayHtml = outgoingHtml + "<br/>" + targetHtmlLines.join("<br/>")
             } else {
                 settle(text)
             }
@@ -57,8 +64,11 @@ Rectangle {
         }
         if (state.captionScroll === 1 && state.captionScrollMs > 0 && targetText.length > 0) {
             outgoing = targetText.split("\n")[0]
+            outgoingHtml = targetHtmlLines.length ? targetHtmlLines[0] : ""
             targetText = text
             displayText = outgoing + "\n" + text
+            targetHtmlLines = state.captionHtmlLines || []
+            displayHtml = outgoingHtml + "<br/>" + targetHtmlLines.join("<br/>")
             scroll.start()
         } else {
             settle(text)
@@ -75,8 +85,8 @@ Rectangle {
             id: captionText
             objectName: "captionText"
             width: viewport.width
-            text: band.displayText
-            textFormat: Text.PlainText
+            text: band.state.captionSpeakerColours ? band.displayHtml : band.displayText
+            textFormat: band.state.captionSpeakerColours ? Text.StyledText : Text.PlainText
             color: DisplayStyle.captionText
             font.family: DisplayStyle.captionFontFamily
             font.pixelSize: Math.round(DisplayStyle.captionFontPx) * band.scaleUnit

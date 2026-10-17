@@ -23,6 +23,8 @@ def main():
     parser.add_argument("config_path")
     parser.add_argument("replay_path")
     parser.add_argument("--raw", action="store_true")
+    parser.add_argument("--diarization", choices=("none", "speaker"))
+    parser.add_argument("--speaker-colours", choices=("white", "speakers"))
     parser.add_argument("--vocabulary", "--vocabulary-file")
     args = parser.parse_args()
     root, config_path, replay_path = args.root, args.config_path, args.replay_path
@@ -33,7 +35,8 @@ def main():
 
     def emit(kind, text):
         protocol.write(
-            json.dumps({"kind": kind, "text": text}) + "\n"
+            json.dumps({"kind": kind, "text": str(text),
+                        **({"runs": text.runs()} if hasattr(text, "runs") else {})}) + "\n"
         )
         protocol.flush()
 
@@ -43,7 +46,8 @@ def main():
         from live_caption.processor import CaptionProcessor
         from live_caption.renderers import make_renderer
 
-        config = load_config(config_path, vocabulary_file=args.vocabulary)
+        config = load_config(config_path, vocabulary_file=args.vocabulary,
+                             diarization=args.diarization, speaker_colours=args.speaker_colours)
         processor = CaptionProcessor(config)
 
         # Renderer selection lives in the overlay section, but the renderer

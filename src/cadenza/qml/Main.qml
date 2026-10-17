@@ -5,7 +5,7 @@ import QtQuick.Window
 
 ApplicationWindow {
     id: operator
-    visible: true; width: 1000; height: 850; minimumWidth: 800; minimumHeight: 810
+    visible: true; width: 1000; height: 900; minimumWidth: 800; minimumHeight: 860
     title: "Cadenza · Operator"; color: "#eef0f1"
     // A complete light control palette, independent of the macOS appearance.
     palette.window: "#eef0f1"
@@ -49,6 +49,22 @@ ApplicationWindow {
             Label { text: "Captions" }
             ComboBox { model: ["AUTO", "ON", "OFF"]; onActivated: controller.setOverride(currentText) }
             Label { text: operator.s.captions ? "Visible" : "Hidden" }
+        }
+        RowLayout {
+            Label { text: "Speaker colours" }
+            ComboBox {
+                objectName: "speakerModeControl"
+                model: ["AUTO", "WHITE", "SPEAKERS"]
+                enabled: operator.s.speakerAvailable
+                currentIndex: model.indexOf(operator.s.speakerOverride)
+                onActivated: controller.setSpeakerOverride(currentText)
+            }
+            Label {
+                Layout.fillWidth: true
+                text: !operator.s.speakerAvailable ? "Unavailable — start with speaker estimation and BBC Live layout"
+                    : operator.s.captionSpeakerColours ? "Speaker colours active" : "White captions"
+                wrapMode: Text.Wrap
+            }
         }
         RowLayout {
             visible: operator.s.hasTimer

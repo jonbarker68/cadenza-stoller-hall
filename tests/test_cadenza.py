@@ -103,6 +103,41 @@ class CaptionTests(unittest.TestCase):
         self.assertFalse(c.state['captions'])
         c.timer.stop()
 
+    def test_slide_speaker_modes_and_operator_override(self):
+        from PySide6.QtCore import QCoreApplication
+        from cadenza.app import Controller
+        app = QCoreApplication.instance() or QCoreApplication([])
+        c = Controller({'slides': [
+            {'title': 'Presenter', 'kind': 'mc', 'captions': True},
+            {'title': 'Panel', 'kind': 'mc', 'captions': True, 'speaker_colours': True}]},
+            argparse.Namespace(demo=True))
+        try:
+            self.assertFalse(c.state['captionSpeakerColours'])
+            c.move(1)
+            self.assertTrue(c.state['captionSpeakerColours'])
+            c.setSpeakerOverride('WHITE')
+            self.assertFalse(c.state['captionSpeakerColours'])
+            c.setSpeakerOverride('SPEAKERS')
+            c.move(-1)
+            self.assertTrue(c.state['captionSpeakerColours'])
+            self.assertEqual(c.state['caption'], '')
+            c.setSpeakerOverride('AUTO')
+            self.assertFalse(c.state['captionSpeakerColours'])
+            c.speaker_available = False
+            c.setSpeakerOverride('SPEAKERS')
+            self.assertFalse(c.state['captionSpeakerColours'])
+            self.assertFalse(c.state['speakerAvailable'])
+        finally:
+            c.timer.stop()
+            c.close()
+
+    def test_invalid_slide_speaker_setting_is_rejected(self):
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml') as f:
+            f.write('slides: [{id: panel, kind: mc, title: Panel, speaker_colours: maybe}]')
+            f.flush()
+            with self.assertRaisesRegex(ValueError, 'speaker_colours'):
+                load_show(f.name)
+
 
 if __name__ == '__main__':
     unittest.main()

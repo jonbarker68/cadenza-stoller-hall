@@ -1,0 +1,12 @@
+# Launch with: cadenza --live --diarization speaker --show config/panel.example.yaml
+slides:
+  - id: presenter
+    kind: mc
+    title: Welcome
+    captions: true
+    speaker_colours: false
+  - id: panel
+    kind: mc
+    title: Panel discussion
+    captions: true
+    speaker_colours: true

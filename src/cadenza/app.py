@@ -25,6 +25,7 @@ class Controller(QObject):
         self.timeline = Timeline(show['slides'])
         self.show = show
         self.override = 'AUTO'
+        self.speaker_override = 'AUTO'
         self.caption = ''
         self.final_text = ''
         self.caption_at = 0
@@ -35,6 +36,8 @@ class Controller(QObject):
         self.caption_scroll = 0
         self.caption_line_height = 40.0
         self.caption_settings = getattr(args, 'caption_settings', {})
+        self.speaker_available = bool(args.demo or getattr(args, 'replay', None) or
+            getattr(args, 'diarization_enabled', False) or getattr(args, 'diarization', None) == 'speaker')
         self.caption_layout_name = getattr(args, 'caption_layout', 'bbc_live')
         self.live_caption_root = Path(getattr(args, 'live_caption', '/Users/jon/projects/live-caption'))
         overlay_settings = self.caption_settings.get('overlay', {})
@@ -97,6 +100,8 @@ class Controller(QObject):
                         config,
                         args.replay or '',
                         '--raw',
+                        *(['--diarization', args.diarization] if getattr(args, 'diarization', None) is not None else []),
+                        *(['--speaker-colours', args.speaker_colours] if getattr(args, 'speaker_colours', None) is not None else []),
                         *(['--vocabulary', str(Path(args.vocabulary).expanduser().resolve())]
                           if getattr(args, 'vocabulary', None) is not None else []),
                     ],
@@ -143,6 +148,12 @@ class Controller(QObject):
             captions=enabled,
             caption=self.caption if enabled else '',
             captionSerial=self.caption_serial,
+            captionSpeakerColours=self.speaker_colours_enabled(),
+            captionHtmlLines=(self.caption_renderer.style.html_lines(self.caption)
+                              if self.caption_renderer is not None and hasattr(self.caption_renderer, 'style')
+                              and self.speaker_colours_enabled() else []),
+            speakerOverride=self.speaker_override,
+            speakerAvailable=self.speaker_available and self.caption_layout_name == 'bbc_live',
             captionPreview=self.caption_preview,
             captionMeasured=self.caption_layout_name == "bbc_live",
             captionWidthFraction=self.caption_width_fraction,
@@ -182,11 +193,27 @@ class Controller(QObject):
             timerSecondaryEnabled=t.phase != 'ready',
         )
 
+    def speaker_colours_enabled(self):
+        requested = (self.timeline.slide.get('speaker_colours',
+            self.caption_settings.get('speakers', {}).get('mode', 'white') == 'speakers')
+            if self.speaker_override == 'AUTO' else self.speaker_override == 'SPEAKERS')
+        return bool(requested and self.speaker_available and self.caption_layout_name == 'bbc_live')
+
+    @Slot(str)
+    def setSpeakerOverride(self, value):
+        if value in ('AUTO', 'WHITE', 'SPEAKERS'):
+            self.speaker_override = value
+            self.reset_captions()
+            logger.info('Speaker display override: %s', value)
+            self.changed.emit()
+
     def reset_captions(self):
         self.caption = self.final_text = ''
         self.caption_scroll = 0
         self.caption_serial += 1
         if self.caption_renderer is not None:
+            if hasattr(self.caption_renderer, 'set_speaker_mode'):
+                self.caption_renderer.set_speaker_mode(self.speaker_colours_enabled())
             self.caption_renderer.reset()
 
     @Slot(str, int, float)
@@ -300,9 +327,16 @@ class Controller(QObject):
 
             try:
                 message = json.loads(line)
+                text = message['text']
+                if 'runs' in message:
+                    root = str(self.live_caption_root.expanduser().resolve() / 'src')
+                    if root not in sys.path:
+                        sys.path.insert(0, root)
+                    from live_caption.speakers import CaptionText
+                    text = CaptionText.from_runs(text, message['runs'])
                 self.ingest(
                     message['kind'],
-                    message['text'],
+                    text,
                 )
             except (ValueError, KeyError, TypeError):
                 self.ingest(
@@ -434,6 +468,11 @@ def main():
         help='YAML vocabulary file; overrides vocabulary_file in caption config (relative to current directory)',
     )
 
+    parser.add_argument('--diarization', choices=('none', 'speaker'),
+                        help='Speaker estimation at session startup (default: config, otherwise none)')
+    parser.add_argument('--speaker-colours', choices=('white', 'speakers'),
+                        help='Default caption display policy; slides/operator may override')
+
     parser.add_argument(
         '--smoke-test',
         action='store_true',
@@ -461,16 +500,20 @@ def main():
         parser.error('--pdf-subtitles requires --export-pdf')
     args.demo = not (args.live or args.replay)
     args.caption_settings = {}
-    if not args.demo or args.vocabulary is not None or Path(args.caption_config).expanduser().exists():
+    args.diarization_enabled = False
+    if (not args.demo or args.vocabulary is not None or args.diarization is not None
+            or args.speaker_colours is not None or Path(args.caption_config).expanduser().exists()):
         try:
             root = str(Path(args.live_caption).expanduser().resolve() / 'src')
             if root not in sys.path:
                 sys.path.insert(0, root)
             from live_caption.config import load_config
-            settings = load_config(args.caption_config, vocabulary_file=args.vocabulary)
+            settings = load_config(args.caption_config, vocabulary_file=args.vocabulary,
+                                   diarization=args.diarization, speaker_colours=args.speaker_colours)
+            args.diarization_enabled = settings["speechmatics"]["diarization"] in ("speaker", "channel_and_speaker")
             # Keep credentials out of presentation state. Schema and processing
             # are owned by live-caption; the bridge applies processing once.
-            args.caption_settings = {key: settings.get(key, {}) for key in ('overlay', 'bbc')}
+            args.caption_settings = {key: settings.get(key, {}) for key in ('overlay', 'bbc', 'speakers')}
         except (OSError, ValueError, TypeError, AttributeError, ImportError, yaml.YAMLError) as exc:
             parser.error('Invalid caption configuration: ' + str(exc))
 

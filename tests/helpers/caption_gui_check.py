@@ -82,6 +82,40 @@ assert band.property('displayText') == 'Welcome\nNext'
 c.caption_renderer._clock = original_clock
 c.reset_captions()
 
+# Speaker colour rendering uses the same measured width and preserves colour
+# on retained/outgoing lines. Partials stay neutral; markup is escaped.
+from live_caption.events import RawASREvent
+from live_caption.processor import CaptionProcessor
+processor = CaptionProcessor({})
+def speaker_words(words, speaker, kind='final'):
+    payload = {'results': [{'alternatives': [{'content': word, 'speaker': speaker}]} for word in words.split()]}
+    return processor.process(RawASREvent(0, kind, words, payload))[1]
+
+c.setSpeakerOverride('SPEAKERS')
+c.ingest('final', speaker_words('Hello everyone', 'S1'))
+c.ingest('final', speaker_words('Welcome to the panel', 'S2'))
+assert c.caption == 'Hello everyone\nWelcome to the panel', c.caption
+assert '#FFE066' in band.property('displayHtml')
+assert text.property('text').startswith('<font')
+assert text.property('contentWidth') <= text.width() + 2
+c.ingest('partial', speaker_words('Tentative <words>', 'S3', 'partial'))
+assert '&lt;words&gt;' in band.property('displayHtml')
+c.ingest('final', speaker_words('Thank you for inviting me', 'S3'))
+wait(220)
+assert c.caption == 'Welcome to the panel\nThank you for inviting me', c.caption
+assert '#FFE066' in band.property('displayHtml')
+assert '#77DDF5' in band.property('displayHtml')
+if __import__('os').environ.get('CADENZA_SPEAKER_PREVIEW'):
+    audience.resize(1280, 720)
+    wait(40)
+    audience.grabWindow().save('/tmp/cadenza-speaker-colours.png')
+c.setSpeakerOverride('WHITE')
+assert c.caption == ''
+c.ingest('final', speaker_words('White again', 'S2'))
+assert text.property('text') == 'White again'
+c.setSpeakerOverride('AUTO')
+c.reset_captions()
+
 # OFF and slide changes reset renderer history as well as visible text.
 c.setOverride('OFF')
 c.ingest('final', 'HIDDEN MUSIC WORDS')
@@ -169,4 +203,27 @@ with tempfile.TemporaryDirectory() as directory:
     QCoreApplication.sendPostedEvents(None, QEvent.DeferredDelete)
     c2.timer.stop()
     c2.close()
+# Replay speaker labels through the real JSON bridge into the measured renderer.
+with tempfile.TemporaryDirectory() as directory:
+    root = Path(directory)
+    config = root / 'config.yaml'
+    config.write_text('speechmatics: {diarization: none}\n')
+    recording = root / 'speakers.jsonl'
+    recording.write_text(''.join(json.dumps(dict(type='asr', t=0, kind='final', text=words,
+        payload={'results': [{'alternatives': [{'content': words, 'speaker': speaker}]}]})) + '\n'
+        for words, speaker in [('One', 'S1'), ('Two', 'S2'), ('Three', 'S3')]))
+    c3 = Controller(show, argparse.Namespace(demo=False, live_caption='/Users/jon/projects/live-caption',
+        caption_config=str(config), replay=str(recording), caption_layout='bbc_live',
+        caption_settings={'speakers': {'mode': 'speakers'}}, diarization='none'))
+    c3.configureCaptionLayout('Arial', 31, 1144)
+    loop = QEventLoop()
+    c3.process.finished.connect(loop.quit)
+    QTimer.singleShot(8000, loop.quit)
+    loop.exec()
+    assert not c3.error, c3.status
+    assert c3.caption == 'Two\nThree', c3.caption
+    assert '#FFE066' in c3.state['captionHtmlLines'][0]
+    assert '#77DDF5' in c3.state['captionHtmlLines'][1]
+    c3.timer.stop()
+    c3.close()
 print('PASS: measured Qt layout, scrolling, off switch, resets, 3 resolutions and raw bridge replay')
