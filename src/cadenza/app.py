@@ -97,6 +97,8 @@ class Controller(QObject):
                         config,
                         args.replay or '',
                         '--raw',
+                        *(['--vocabulary', str(Path(args.vocabulary).expanduser().resolve())]
+                          if getattr(args, 'vocabulary', None) is not None else []),
                     ],
                 )
 
@@ -428,6 +430,11 @@ def main():
     )
 
     parser.add_argument(
+        '--vocabulary', '--vocabulary-file', metavar='FILE',
+        help='YAML vocabulary file; overrides vocabulary_file in caption config (relative to current directory)',
+    )
+
+    parser.add_argument(
         '--smoke-test',
         action='store_true',
         help=argparse.SUPPRESS,
@@ -454,13 +461,13 @@ def main():
         parser.error('--pdf-subtitles requires --export-pdf')
     args.demo = not (args.live or args.replay)
     args.caption_settings = {}
-    if not args.demo or Path(args.caption_config).exists():
+    if not args.demo or args.vocabulary is not None or Path(args.caption_config).expanduser().exists():
         try:
             root = str(Path(args.live_caption).expanduser().resolve() / 'src')
             if root not in sys.path:
                 sys.path.insert(0, root)
             from live_caption.config import load_config
-            settings = load_config(args.caption_config)
+            settings = load_config(args.caption_config, vocabulary_file=args.vocabulary)
             # Keep credentials out of presentation state. Schema and processing
             # are owned by live-caption; the bridge applies processing once.
             args.caption_settings = {key: settings.get(key, {}) for key in ('overlay', 'bbc')}

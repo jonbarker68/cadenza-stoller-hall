@@ -13,7 +13,7 @@ PROJECT = Path(__file__).resolve().parents[1]
 
 @unittest.skipUnless((LIVE / 'src/live_caption/processor.py').exists(), 'Requires shared live-caption checkout')
 class CaptionProcessingIntegrationTests(unittest.TestCase):
-    def bridge(self, config, raw):
+    def bridge(self, config, raw, vocabulary=None):
         with tempfile.TemporaryDirectory() as directory:
             folder = Path(directory)
             settings = folder / 'config.yaml'
@@ -26,6 +26,10 @@ class CaptionProcessingIntegrationTests(unittest.TestCase):
                                          for kind, text in events))
             command = [sys.executable, str(PROJECT / 'src/cadenza/bridge.py'),
                        str(LIVE), str(settings), str(recording)]
+            if vocabulary is not None:
+                vocabulary_path = folder / 'vocabulary with spaces.yaml'
+                vocabulary_path.write_text(vocabulary)
+                command.extend(['--vocabulary', str(vocabulary_path)])
             if raw:
                 command.append('--raw')
             result = subprocess.run(command, capture_output=True, text=True, timeout=10,
@@ -54,3 +58,25 @@ class CaptionProcessingIntegrationTests(unittest.TestCase):
                 texts = [e['text'] for e in self.bridge(config, True) if e['kind'] in ('partial', 'final')]
                 self.assertIn('fucking everyone', texts)
                 self.assertIn('fuck', texts)
+
+    def test_bridge_cli_overrides_missing_configured_dictionary(self):
+        events = self.bridge('vocabulary_file: missing.yaml', True, '- Cadenza\n')
+        self.assertTrue(any(event['text'] == 'Welcome' for event in events))
+
+    def test_cadenza_cli_validates_shared_vocabulary_and_override(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            config = root / 'config.yaml'
+            config.write_text('vocabulary_file: missing.yaml\n')
+            vocabulary = root / 'words.yaml'
+            vocabulary.write_text('- Cadenza\n')
+            env = dict(os.environ, PYTHONPATH=str(PROJECT / 'src'), QT_QPA_PLATFORM='offscreen',
+                       QT_QUICK_BACKEND='software', PYTHONDONTWRITEBYTECODE='1')
+            command = [sys.executable, '-m', 'cadenza.app', '--caption-config', str(config),
+                       '--log-dir', str(root / 'logs'), '--smoke-test']
+            bad = subprocess.run(command, cwd=PROJECT, env=env, capture_output=True, text=True, timeout=10)
+            self.assertNotEqual(bad.returncode, 0)
+            self.assertIn('missing.yaml', bad.stderr)
+            good = subprocess.run(command + ['--vocabulary-file', str(vocabulary)], cwd=PROJECT,
+                                  env=env, capture_output=True, text=True, timeout=10)
+            self.assertEqual(good.returncode, 0, good.stdout + good.stderr)

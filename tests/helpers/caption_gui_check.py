@@ -108,14 +108,16 @@ c.close()
 with tempfile.TemporaryDirectory() as directory:
     root = Path(directory)
     config = root / 'config.yaml'
-    config.write_text('overlay: {scroll_duration_ms: 0}\n')
+    config.write_text('overlay: {scroll_duration_ms: 0}\nvocabulary_file: missing.yaml\n')
+    vocabulary = root / 'vocabulary with spaces.yaml'
+    vocabulary.write_text('- Cadenza\n')
     recording = root / 'replay.jsonl'
     recording.write_text(''.join(json.dumps(dict(type='asr', t=t, kind=kind, text=words)) + '\n'
         for t, kind, words in [(0, 'partial', 'Test fucking phrase'), (.05, 'final', 'Test phrase'),
                               (.06, 'partial', 'temporary'), (.07, 'partial', 'shit'),
                               (.08, 'final', 'fuck'), (.1, 'final', 'from the bridge.')]))
     c2 = Controller(show, argparse.Namespace(demo=False, live_caption='/Users/jon/projects/live-caption',
-        caption_config=str(config), replay=str(recording), caption_layout='bbc_live'))
+        caption_config=str(config), replay=str(recording), caption_layout='bbc_live', vocabulary=str(vocabulary)))
     c2.configureCaptionLayout('Arial', 31, 1144)
     loop = QEventLoop()
     c2.process.finished.connect(loop.quit)

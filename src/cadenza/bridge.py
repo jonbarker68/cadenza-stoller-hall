@@ -8,6 +8,7 @@ presentation process. Without it, retain the rendered-caption protocol for
 older consumers. The native live-caption overlay is never imported.
 """
 
+import argparse
 import contextlib
 import json
 from pathlib import Path
@@ -17,8 +18,15 @@ import sys
 
 
 def main():
-    root, config_path, replay_path = sys.argv[1:4]
-    raw_output = "--raw" in sys.argv[4:]
+    parser = argparse.ArgumentParser(description="Cadenza caption source bridge")
+    parser.add_argument("root")
+    parser.add_argument("config_path")
+    parser.add_argument("replay_path")
+    parser.add_argument("--raw", action="store_true")
+    parser.add_argument("--vocabulary", "--vocabulary-file")
+    args = parser.parse_args()
+    root, config_path, replay_path = args.root, args.config_path, args.replay_path
+    raw_output = args.raw
     sys.path.insert(0, str(Path(root) / "src"))
 
     protocol = sys.stdout
@@ -35,7 +43,7 @@ def main():
         from live_caption.processor import CaptionProcessor
         from live_caption.renderers import make_renderer
 
-        config = load_config(config_path)
+        config = load_config(config_path, vocabulary_file=args.vocabulary)
         processor = CaptionProcessor(config)
 
         # Renderer selection lives in the overlay section, but the renderer
