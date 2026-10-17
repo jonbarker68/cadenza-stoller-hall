@@ -68,7 +68,7 @@ The audience view uses the title/body, persistent excerpt (`passage`) and bookle
 
 ## Architecture and checks
 
-`model.py` validates YAML and owns monotonic timers. `app.py` exposes shared state to two QML windows. `bridge.py` runs in a separate process, importing only existing live-caption ASR/config/recording modules, and sends JSON-lines events to the presentation. No existing live-caption files are changed, no overlay UI is loaded, and caption credentials remain in the local configuration or environment. The adapter forwards raw partial/final events to the presentation. The Qt process imports only live-caption’s shared renderers, measuring text in the audience font. This path does not apply live-caption’s optional text-processing filters.
+`model.py` validates YAML and owns monotonic timers. `app.py` exposes shared state to two QML windows. `bridge.py` runs in a separate process, importing live-caption ASR/config/recording/processing modules, and sends JSON-lines events to the presentation. No overlay UI is loaded, and caption credentials remain in the local configuration or environment. The adapter forwards processed partial/final events to the presentation. The Qt process imports only live-caption’s shared renderers, measuring text in the audience font. Both apps use the shared caption processor before rendering.
 
 ```sh
 PYTHONPATH=src /Users/jon/projects/live-caption/.venv/bin/python -m unittest discover -s tests -v
@@ -148,7 +148,7 @@ Cadenza now defaults to the shared `bbc_live` renderer. Launch using the usual c
 uv run cadenza --live --caption-config ./config/caption-config.yaml
 ```
 
-The bridge isolates microphone/transcription in its own process and sends raw speech events. Cadenza supplies Qt font measurements to the shared renderer on its GUI thread, then displays the resulting two lines without wrapping or shrinking them again. Operator preview and audience view share a reference caption width, so their line breaks match even at different window sizes. Slide navigation, manual caption overrides and the eight-second idle timeout clear renderer history as well as the visible caption. Hidden speech is not added to the renderer.
+The bridge isolates microphone/transcription in its own process and sends processed speech events. Cadenza supplies Qt font measurements to the shared renderer on its GUI thread, then displays the resulting two lines without wrapping or shrinking them again. Operator preview and audience view share a reference caption width, so their line breaks match even at different window sizes. Slide navigation, manual caption overrides and the eight-second idle timeout clear renderer history as well as the visible caption. Hidden speech is not added to the renderer.
 
 Set animation duration in your caption configuration:
 
@@ -167,7 +167,7 @@ Test without microphone/network access, using the live-caption sample recording:
 uv run cadenza --replay /Users/jon/projects/live-caption/tests/fixtures/caption-layout.jsonl
 ```
 
-Advance past arrivals or select captions ON before the recording begins. A new subprocess GUI regression check exercises measured wrapping, animation/off, history resets, three display sizes and replay through the real caption bridge. No changes to the live-caption project are required by this integration.
+Advance past arrivals or select captions ON before the recording begins. A new subprocess GUI regression check exercises measured wrapping, animation/off, history resets, three display sizes and replay through the real caption bridge. Use the updated live-caption checkout for the shared schema, processing and renderers.
 
 ### Caption region width in Cadenza
 
@@ -222,3 +222,64 @@ Standard text slides accept an optional `subtitle` (below the body) and a `style
 These controls affect the standard text column, including excerpt slides; they do not reposition booklet labels, timers or captions. Arrivals and the logo welcome slide use dedicated layouts with their own geometry. Keep those as reusable templates; add further named layouts when a slide needs a different structure rather than accumulating arbitrary coordinates. Preview larger text with `--export-pdf ... --pdf-subtitles` to check that it clears timers and captions.
 
 When no per-slide `font_family` is supplied, text uses the Qt application font in both live presentation and PDF export. Empty font names are not used, avoiding platform-dependent emoji-font fallback and oversized word spacing.
+
+## Shared caption configuration and profanity handling
+
+Both apps use `live_caption.config.load_config` / `resolve_config` and
+`live_caption.processor.CaptionProcessor` from the live-caption checkout.
+Speechmatics and replay events are processed before text measurement/wrapping.
+Cadenza applies this in its bridge for both `--raw` (processed hypotheses) and
+legacy rendered output; the presentation does not implement a second filter.
+Use the same YAML file in both apps to share audio, Speechmatics, processing,
+`overlay`, and `bbc` settings. Unknown/existing settings are preserved.
+
+```yaml
+processing:
+  profanity:
+    mode: omit
+    additional_words: []
+    allow_words: []
+```
+
+`omit` is the default when no profanity settings are supplied. It removes whole
+words tagged as profanity by Speechmatics, plus a built-in English list including
+common inflections even when tags are absent (e.g. a spurious ASR hypothesis).
+Matching is case-insensitive and respects word boundaries, so `assessment` and
+`Scunthorpe` are retained. `additional_words` adds whole words or phrases;
+`allow_words` permits exact terms, including tagged terms. The English list lives
+in `live_caption/processor.py` as `DEFAULT_PROFANITIES`; it is not an exhaustive
+multilingual or obfuscated-profanity detector. Partial word fragments that do not
+yet match a complete term are not guessed or delayed.
+
+Set `mode: off` to show ASR output verbatim. The old
+`processing.profanity_filter: false` remains an explicit opt-out; `true` now
+means omission. An explicit `processing.profanity` mapping takes precedence over
+the old flag. `profanity_replacement` is accepted for compatibility but ignored;
+there is no masking/bleeping mode. Remove the legacy false flag to adopt the new
+default, or explicitly select `mode: omit`.
+
+Each partial replaces the preceding provisional hypothesis; every final commits
+only its newly recognised clean text. Empty/fully omitted updates still clear
+provisional text while retaining earlier committed speech. Omission removes
+attached punctuation and empty quote/bracket pairs and closes whitespace gaps.
+Filtering precedes all three renderers (`bbc_live`, `bbc`, `rolling`), so omitted
+words consume no layout width. Font, alignment, line count, line width, measured
+wrapping and animation settings keep their existing meanings. Cadenza retains
+its presentation font and CLI layout override.
+
+Raw `--record` JSONL files intentionally retain the original ASR text/payload,
+including any profanity; replay applies the current processing settings. The
+filter changes captions, not audio or recognition accuracy. Restart the app
+after changing settings.
+
+See `config/caption-config.example.yaml` for the tracked credential-free example.
+The existing local `config/caption-config.yaml` remains Git-ignored. To use the
+same settings as the standalone overlay:
+
+```sh
+uv run cadenza --live --caption-config ~/.config/live-caption/config.yaml
+```
+
+Cadenza imports the schema from the checkout selected by `--live-caption` and
+validates it at startup; its bridge uses that same checkout/interpreter. Its
+presentation state retains only `overlay` and `bbc`, excluding credentials.

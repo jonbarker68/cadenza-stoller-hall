@@ -111,8 +111,9 @@ with tempfile.TemporaryDirectory() as directory:
     config.write_text('overlay: {scroll_duration_ms: 0}\n')
     recording = root / 'replay.jsonl'
     recording.write_text(''.join(json.dumps(dict(type='asr', t=t, kind=kind, text=words)) + '\n'
-        for t, kind, words in [(0, 'partial', 'Test phrase'), (.05, 'final', 'Test phrase'),
-                              (.1, 'final', 'from the bridge.')]))
+        for t, kind, words in [(0, 'partial', 'Test fucking phrase'), (.05, 'final', 'Test phrase'),
+                              (.06, 'partial', 'temporary'), (.07, 'partial', 'shit'),
+                              (.08, 'final', 'fuck'), (.1, 'final', 'from the bridge.')]))
     c2 = Controller(show, argparse.Namespace(demo=False, live_caption='/Users/jon/projects/live-caption',
         caption_config=str(config), replay=str(recording), caption_layout='bbc_live'))
     c2.configureCaptionLayout('Arial', 31, 1144)

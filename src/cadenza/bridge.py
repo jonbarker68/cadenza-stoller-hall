@@ -3,7 +3,7 @@
 Runs using live-caption's interpreter; never imports its overlay or GUI.
 Stdout is a JSON-lines protocol, with library output redirected to stderr.
 
-With --raw, send partial/final events for measured rendering in the Qt
+With --raw, send processed partial/final events for measured rendering in the Qt
 presentation process. Without it, retain the rendered-caption protocol for
 older consumers. The native live-caption overlay is never imported.
 """
@@ -32,9 +32,11 @@ def main():
     with contextlib.redirect_stdout(sys.stderr):
         from live_caption.config import load_config
         from live_caption.recording import ReplayWorker
+        from live_caption.processor import CaptionProcessor
         from live_caption.renderers import make_renderer
 
         config = load_config(config_path)
+        processor = CaptionProcessor(config)
 
         # Renderer selection lives in the overlay section, but the renderer
         # itself needs the complete caption configuration (e.g. config["bbc"]).
@@ -79,21 +81,23 @@ def main():
                         emit(kind, text)
                     break
 
+                output = processor.process(event)
+                if output is None:
+                    continue
+                kind, text = output
                 if raw_output:
-                    emit(event.kind, event.text)
-                elif event.kind == "partial":
+                    emit(kind, text)
+                elif kind == "partial":
                     emit(
                         "caption",
-                        renderer.update_partial(event.text),
+                        renderer.update_partial(text),
                     )
 
-                elif event.kind == "final":
+                elif kind == "final":
                     emit(
                         "caption",
-                        renderer.add_final(event.text),
+                        renderer.add_final(text),
                     )
-                else:
-                    emit(event.kind, event.text)
 
         finally:
             worker.stop()

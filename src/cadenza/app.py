@@ -456,23 +456,15 @@ def main():
     args.caption_settings = {}
     if not args.demo or Path(args.caption_config).exists():
         try:
-            with open(args.caption_config, encoding='utf-8') as stream:
-                settings = yaml.safe_load(stream) or {}
-            if not isinstance(settings, dict):
-                raise ValueError('Caption configuration must be a mapping')
-            # Do not retain credentials in presentation state.
+            root = str(Path(args.live_caption).expanduser().resolve() / 'src')
+            if root not in sys.path:
+                sys.path.insert(0, root)
+            from live_caption.config import load_config
+            settings = load_config(args.caption_config)
+            # Keep credentials out of presentation state. Schema and processing
+            # are owned by live-caption; the bridge applies processing once.
             args.caption_settings = {key: settings.get(key, {}) for key in ('overlay', 'bbc')}
-            if not all(isinstance(value, dict) for value in args.caption_settings.values()):
-                raise ValueError('overlay and bbc caption settings must be mappings')
-            for key in ('width_fraction', 'max_width'):
-                if key in args.caption_settings['overlay']:
-                    width_value = float(args.caption_settings['overlay'][key])
-                    if not math.isfinite(width_value) or width_value <= 0 or (key == 'width_fraction' and width_value > 1):
-                        raise ValueError(f'overlay.{key} must be positive and finite (width_fraction at most 1)')
-            duration = float(args.caption_settings['overlay'].get('scroll_duration_ms', 180))
-            if not math.isfinite(duration) or not 0 <= duration <= 1000:
-                raise ValueError('overlay.scroll_duration_ms must be between 0 and 1000')
-        except (OSError, ValueError, TypeError, AttributeError, yaml.YAMLError) as exc:
+        except (OSError, ValueError, TypeError, AttributeError, ImportError, yaml.YAMLError) as exc:
             parser.error('Invalid caption configuration: ' + str(exc))
 
     from .diagnostics import configure_logging, configured_secrets
