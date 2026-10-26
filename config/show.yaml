@@ -9,12 +9,21 @@ slides:
     The Pastoral Symphony'
   captions: false
   notes: Display while the audience arrives and takes their seats. Keep captions on AUTO (hidden on this slide).
-    Advance once when the event begins to show the existing MC introduction; captions then appear automatically.
+    Advance once for the alternative arrival screen with the questionnaire reminder, then once more when the event begins for the MC introduction.
+- id: arrivals-questionnaire
+  kind: arrivals
+  layout: arrivals-questionnaire
+  title: Research concert
+  body: 'Beethoven’s Symphony No. 6
+
+    The Pastoral Symphony'
+  captions: false
+  notes: 'Alternative arrival screen: the Background Questionnaire prompt appears in large subtitle-sized type for 12 seconds, then fades out for 10 seconds. Booklet pages 3–4. Leave this slide showing while people settle; advance once for the MC introduction. Live captions take priority if switched on.'
 - id: mc-introduction
   layout: welcome
   kind: mc
   title: Welcome to the Cadenza Camerata Research Concert
-  body: 'Introduction from Dr Alinka Greasly, University of Leeds'
+  body: 'Introduction from Dr Alinka Greasley, University of Leeds'
   captions: true
   notes: 'Select AUTO for captions. Introduce the event and voluntary participation. Background questionnaire: pages
     3–4; definitions: page 5; research instructions: page 6. Hold here for Movement I, manually selecting OFF during
@@ -24,7 +33,7 @@ slides:
   kind: mc
   title: Beethoven at the time of writing Symphony 6 
   body: 'Gábor Takács-Nagy'
-  subtitle: Conductor of the Manchester Camerata
+  subtitle: Music Director of the Manchester Camerata
   style:
     alignment: center
     spacing: 22
@@ -62,7 +71,7 @@ slides:
   page: 7
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 1; manually select OFF when the
-    orchestra begins. Advance only when the music ends. Booklet focus: loudness; trial run.'
+    orchestra begins. Advance only when the music ends.'
 - id: response-1
   kind: response
   title: Complete your responses
@@ -79,7 +88,7 @@ slides:
   page: 8
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 2; manually select OFF when the
-    orchestra begins. Advance only when the music ends. Booklet focus: loudness; trial run.'
+    orchestra begins. Advance only when the music ends.'
 - id: response-2
   kind: response
   title: Complete your responses
@@ -96,7 +105,7 @@ slides:
   page: 9
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 3; manually select OFF when the
-    orchestra begins. Advance only when the music ends. Booklet focus: clarity.'
+    orchestra begins. Advance only when the music ends.'
 - id: response-3
   kind: response
   title: Complete your responses
@@ -113,7 +122,7 @@ slides:
   page: 10
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 4; manually select OFF when the
-    orchestra begins. Advance only when the music ends. Booklet focus: clarity.'
+    orchestra begins. Advance only when the music ends.'
 - id: response-4
   kind: response
   title: Complete your responses
@@ -130,7 +139,7 @@ slides:
   page: 11
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 5; manually select OFF when the
-    orchestra begins. Advance only when the music ends. Booklet focus: loudness and distortion.'
+    orchestra begins. Advance only when the music ends.'
 - id: response-5
   kind: response
   title: Complete your responses
@@ -147,7 +156,7 @@ slides:
   page: 12
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 6; manually select OFF when the
-    orchestra begins. Advance only when the music ends. Booklet focus: loudness and distortion.'
+    orchestra begins. Advance only when the music ends.'
 - id: response-6
   kind: response
   title: Complete your responses
@@ -164,7 +173,7 @@ slides:
   page: 13
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 7; manually select OFF when the
-    orchestra begins. Advance only when the music ends. Booklet focus: frequency balance and harshness.'
+    orchestra begins. Advance only when the music ends.'
 - id: response-7
   kind: response
   title: Complete your responses
@@ -181,7 +190,7 @@ slides:
   page: 14
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 8; manually select OFF when the
-    orchestra begins. Advance only when the music ends. Booklet focus: frequency balance and harshness.'
+    orchestra begins. Advance only when the music ends.'
 - id: response-8
   kind: response
   title: Complete your responses
@@ -198,7 +207,7 @@ slides:
   page: 15
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 9; manually select OFF when the
-    orchestra begins. Advance only when the music ends. Booklet focus: clarity.'
+    orchestra begins. Advance only when the music ends.'
 - id: response-9
   kind: response
   title: Complete your responses
@@ -215,7 +224,7 @@ slides:
   page: 16
   captions: true
   notes: 'Select AUTO for the MC introduction. Keep this slide throughout Excerpt 10; manually select OFF when the
-    orchestra begins. Advance only when the music ends. Booklet focus: clarity.'
+    orchestra begins. Advance only when the music ends.'
 - id: response-10
   kind: response
   title: Complete your responses
@@ -256,4 +265,37 @@ slides:
   title: Thank you for taking part
   body: 'The research activities are complete.'
   captions: true
-  notes: Select AUTO for closing remarks and Q&A. Give the organisers’ booklet collection instructions.
+  notes: Select AUTO for the end of the research activities. Advance to the Q&A slide, then the final feedback screen.
+
+- id: audience-questions
+  kind: mc
+  layout: two-columns
+  title: Question & Answer
+  body: |-
+    Professor Trevor Cox
+    University of Salford
+
+    Dr Bruno Fazenda
+    University of Salford
+  subtitle: |-
+    Dr Alinka Greasley
+    University of Leeds
+
+    Dr William Whitmer
+    University of Nottingham
+  captions: true
+  style:
+    alignment: center
+    content_y: 140
+    spacing: 32
+    title:
+      font_size: 60
+    body:
+      font_size: 36
+  notes: 'Q&A led by Professor Trevor Cox and Dr Alinka Greasely. Keep captions on AUTO. Advance to the feedback screen at the end of the session.'
+- id: closing-feedback
+  kind: closing
+  layout: closing-feedback
+  title: Thank you for taking part
+  captions: true
+  notes: 'Final feedback screen. Invite the audience to scan the QR code or visit cadenzachallenge.org/camerata/survey. Keep AUTO for closing remarks; select OFF once speech has ended. Give booklet collection instructions.'

@@ -88,7 +88,7 @@ Rectangle {
         SlideText {
             objectName: "slideBody"
             width: parent.width
-            visible: text.length > 0
+            visible: text.length > 0 && slide.state.layout !== "two-columns"
             text: slide.state.body
             appearance: slide.state.style.body || ({})
             scaleUnit: slide.scaleUnit
@@ -96,10 +96,28 @@ Rectangle {
             color: DisplayStyle.bodyText
             horizontalAlignment: slide.contentAlignment
         }
+        Row {
+            visible: slide.state.layout === "two-columns"
+            width: parent.width
+            spacing: 40 * slide.scaleUnit
+            Repeater {
+                model: [slide.state.body, slide.state.subtitle]
+                SlideText {
+                    objectName: "speakerColumn" + index
+                    width: (parent.width - 40 * slide.scaleUnit) / 2
+                    text: modelData
+                    appearance: slide.state.style.body || ({})
+                    scaleUnit: slide.scaleUnit
+                    defaultFontPx: DisplayStyle.bodyFontPx
+                    color: DisplayStyle.bodyText
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            }
+        }
         SlideText {
             objectName: "slideSubtitle"
             width: parent.width
-            visible: text.length > 0
+            visible: text.length > 0 && slide.state.layout !== "two-columns"
             text: slide.state.subtitle
             appearance: slide.state.style.subtitle || ({})
             scaleUnit: slide.scaleUnit
@@ -175,6 +193,56 @@ Rectangle {
             font.pixelSize: DisplayStyle.responseTimerFontPx * slide.scaleUnit
             font.family: DisplayStyle.timerFontFamily
         }
+    }
+
+    Rectangle {
+        id: questionnairePrompt
+        objectName: "questionnairePrompt"
+        property bool active: slide.state.kind === "arrivals"
+                              && slide.state.layout === "arrivals-questionnaire"
+                              && !(slide.state.captions && slide.state.caption.length > 0)
+        visible: active
+        opacity: 1
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: DisplayStyle.captionBottomMargin * slide.scaleUnit
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width - 2 * DisplayStyle.captionSideMargin * slide.scaleUnit
+        height: DisplayStyle.captionBandHeight * slide.scaleUnit
+        radius: DisplayStyle.captionRadius * slide.scaleUnit
+        color: DisplayStyle.captionBackground
+        onActiveChanged: {
+            promptCycle.stop()
+            opacity = 1
+            if (active) promptCycle.start()
+        }
+        Text {
+            objectName: "questionnairePromptText"
+            anchors.centerIn: parent
+            width: parent.width - 2 * DisplayStyle.captionPaddingX * slide.scaleUnit
+            text: "While you wait, please start the Background Questionnaire\nPages 3–4 of your audience booklet"
+            font.family: DisplayStyle.captionFontFamily
+            font.pixelSize: DisplayStyle.captionFontPx * slide.scaleUnit
+            color: DisplayStyle.captionText
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.NoWrap
+            lineHeight: 1.3
+        }
+        SequentialAnimation {
+            id: promptCycle
+            objectName: "questionnairePromptCycle"
+            running: questionnairePrompt.active
+            loops: Animation.Infinite
+            PauseAnimation { duration: 12000 }
+            NumberAnimation { target: questionnairePrompt; property: "opacity"; to: 0; duration: 450 }
+            PauseAnimation { duration: 10000 }
+            NumberAnimation { target: questionnairePrompt; property: "opacity"; to: 1; duration: 450 }
+        }
+    }
+
+    ClosingSlide {
+        anchors.fill: parent
+        visible: slide.state.layout === "closing-feedback"
+        scaleUnit: slide.scaleUnit
     }
 
     CaptionBand {

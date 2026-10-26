@@ -9,7 +9,7 @@ def export_pdf(show, destination, *, args=None):
     # Select the headless software renderer before creating any Qt application.
     os.environ['QT_QPA_PLATFORM'] = 'offscreen'
     os.environ['QT_QUICK_BACKEND'] = 'software'
-    from PySide6.QtCore import QCoreApplication, QEvent, QEventLoop, QMarginsF, QSizeF, QTimer, QUrl
+    from PySide6.QtCore import QCoreApplication, QEvent, QEventLoop, QMarginsF, QObject, QSizeF, QTimer, QUrl
     from PySide6.QtGui import QGuiApplication, QPageLayout, QPageSize, QPainter, QPdfWriter
     from PySide6.QtQuick import QQuickView
     from .app import Controller
@@ -56,7 +56,9 @@ def export_pdf(show, destination, *, args=None):
         view.show()
         for index in range(len(show['slides'])):
             controller.move(index - controller.timeline.index)
+            questionnaire = show['slides'][index].get('layout') == 'arrivals-questionnaire'
             if preview:
+                controller.setOverride('OFF' if questionnaire else 'ON')
                 controller.reset_captions()
                 controller.ingest('final', (
                     'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
@@ -66,6 +68,12 @@ def export_pdf(show, destination, *, args=None):
             loop = QEventLoop()
             QTimer.singleShot(100, loop.quit)
             loop.exec()
+            if questionnaire:
+                # The static review must show the real arrival instruction,
+                # not sample subtitles or the animation's hidden phase.
+                root = view.rootObject()
+                root.findChild(QObject, 'questionnairePromptCycle').stop()
+                root.findChild(QObject, 'questionnairePrompt').setProperty('opacity', 1)
             image = view.grabWindow()
             if image.isNull():
                 raise RuntimeError(f'Could not render slide {index + 1}')
