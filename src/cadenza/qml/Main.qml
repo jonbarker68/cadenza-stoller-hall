@@ -30,9 +30,9 @@ ApplicationWindow {
     palette.disabled.button: "#e4e8eb"
     property var s: controller.state
     onClosing: Qt.quit()
-    Shortcut { sequence: "Right"; onActivated: controller.move(1) }
-    Shortcut { sequence: "Left"; onActivated: controller.move(-1) }
-    Shortcut { sequence: "Space"; onActivated: controller.move(1) }
+    Shortcut { enabled: !slidePicker.popup.visible; sequence: "Right"; onActivated: controller.move(1) }
+    Shortcut { enabled: !slidePicker.popup.visible; sequence: "Left"; onActivated: controller.move(-1) }
+    Shortcut { enabled: !slidePicker.popup.visible; sequence: "Space"; onActivated: controller.move(1) }
     ColumnLayout {
         anchors.fill: parent; anchors.margins: 24; spacing: 12
         RowLayout {
@@ -42,6 +42,18 @@ ApplicationWindow {
         Slide { Layout.fillWidth: true; Layout.preferredHeight: width * 9/16; Layout.maximumHeight: 430 }
         Label { text: "UP NEXT   " + operator.s.nextTitle; font.bold: true; Layout.fillWidth: true; elide: Text.ElideRight }
         Label { text: operator.s.notes; wrapMode: Text.Wrap; Layout.fillWidth: true }
+        RowLayout {
+            Label { text: "Jump to slide" }
+            ComboBox {
+                id: slidePicker
+                objectName: "slidePicker"
+                Layout.fillWidth: true
+                model: controller.slideChoices
+                currentIndex: operator.s.index
+                Accessible.name: "Jump to slide"
+                onActivated: function(index) { controller.jumpToSlide(index) }
+            }
+        }
         RowLayout {
             Button { text: "← Back"; enabled: operator.s.index > 0; onClicked: controller.move(-1) }
             Button { text: "Next →"; enabled: operator.s.index < operator.s.count-1; highlighted: true; onClicked: controller.move(1) }

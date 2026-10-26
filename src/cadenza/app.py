@@ -247,6 +247,17 @@ class Controller(QObject):
             self.ingest('error', 'Caption layout failed: ' + str(exc))
         self.changed.emit()
 
+    @Property('QStringList', constant=True)
+    def slideChoices(self):
+        return [f"{i + 1}. {slide['title']}"
+                + (f" — excerpt {slide['passage']}" if slide.get('passage') else '')
+                for i, slide in enumerate(self.timeline.slides)]
+
+    @Slot(int)
+    def jumpToSlide(self, index):
+        if 0 <= index < len(self.timeline.slides):
+            self.move(index - self.timeline.index)
+
     @Slot(int)
     def move(self, delta):
         if self.timeline.move(delta):
