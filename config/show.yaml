@@ -1,5 +1,6 @@
 # Audience Booklet: Stoller Hall, 29 October 2026. Page numbers are printed booklet pages.
 title: Cadenza · Stoller Hall
+credits: credits.yaml
 slides:
 - id: arrivals
   kind: arrivals
@@ -357,4 +358,10 @@ slides:
   layout: closing-feedback
   title: Thank you for taking part
   captions: true
-  notes: 'Final feedback screen. Invite the audience to scan the QR code or visit cadenzachallenge.org/camerata/survey. Keep AUTO for closing remarks; select OFF once speech has ended. Give booklet collection instructions.'
+  notes: 'Original closing slide with QR code and room for subtitles. Stay here to finish with this version, or advance once for the alternative scrolling credits.'
+- id: closing-credits
+  kind: closing
+  layout: closing-credits
+  title: Thank you for taking part — credits
+  captions: false
+  notes: 'Alternative closing slide with scrolling credits. Sample names and affiliations are placeholders: edit config/credits.yaml before use. Pause or restart with the credits controls. No subtitles on this version.'

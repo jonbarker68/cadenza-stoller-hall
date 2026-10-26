@@ -134,6 +134,12 @@ ApplicationWindow {
             Item { Layout.fillWidth: true }
         }
         RowLayout {
+            visible: operator.s.layout === "closing-credits"
+            Label { text: "Credits" }
+            Button { text: operator.s.creditsPaused ? "Resume credits" : "Pause credits"; onClicked: controller.toggleCredits() }
+            Button { text: "Restart credits"; onClicked: controller.restartCredits() }
+        }
+        RowLayout {
             Label { text: "Audience display" }
             ComboBox {
                 id: screens; Layout.fillWidth: true; model: Qt.application.screens

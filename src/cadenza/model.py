@@ -1,4 +1,5 @@
 """Validated show definitions and monotonic presentation timing."""
+from pathlib import Path
 import math
 import time
 import yaml
@@ -69,6 +70,26 @@ def load_show(path):
             duration = slide.get('duration')
             if isinstance(duration, bool) or not isinstance(duration, (int, float)) or not math.isfinite(duration) or duration <= 0:
                 raise ValueError('Response duration must be a positive finite number')
+    if show.get('credits'):
+        credits_path = Path(path).resolve().parent / show['credits']
+        with credits_path.open(encoding='utf-8') as stream:
+            credits = yaml.safe_load(stream)
+        if not isinstance(credits, dict) or not isinstance(credits.get('sections'), list):
+            raise ValueError('Credits must contain a sections list')
+        for key, default in (('speed', 24), ('pause_seconds', 4)):
+            value = credits.get(key, default)
+            if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value <= 0:
+                raise ValueError(f'Credits {key} must be positive and finite')
+            credits[key] = value
+        for section in credits['sections']:
+            if not isinstance(section, dict) or not all(isinstance(section.get(k), str) for k in ('heading', 'names')):
+                raise ValueError('Every credit section needs heading and names text')
+            if section.get('logo'):
+                logo = (credits_path.parent / section['logo']).resolve()
+                if not logo.is_file():
+                    raise ValueError(f'Credit logo not found: {logo}')
+                section['logo'] = logo.as_uri()
+        show['credits_data'] = credits
     return show
 
 

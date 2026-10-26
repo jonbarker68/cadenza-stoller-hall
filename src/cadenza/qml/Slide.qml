@@ -245,8 +245,15 @@ Rectangle {
         scaleUnit: slide.scaleUnit
     }
 
+    CreditsSlide {
+        anchors.fill: parent
+        visible: slide.state.layout === "closing-credits"
+        scaleUnit: slide.scaleUnit
+    }
+
     CaptionBand {
         objectName: "captionBand"
+        visible: slide.state.layout !== "closing-credits" && slide.state.captions && slide.state.caption.length > 0
         state: slide.state
         scaleUnit: slide.scaleUnit
         anchors.bottom: parent.bottom

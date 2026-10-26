@@ -24,6 +24,10 @@ class Controller(QObject):
         super().__init__()
         self.timeline = Timeline(show['slides'])
         self.show = show
+        self.credits_started = time.monotonic()
+        self.credits_saved = 0.0
+        self.credits_paused = False
+        self.static_export = bool(getattr(args, 'static_export', False))
         self.override = 'AUTO'
         self.speaker_override = 'AUTO'
         self.caption = ''
@@ -128,6 +132,10 @@ class Controller(QObject):
         )
 
         return dict(
+            credits=self.show.get('credits_data', {'heading': 'Credits', 'sections': [], 'speed': 24, 'pause_seconds': 4}),
+            creditsElapsed=self.credits_saved + (0 if self.credits_paused else time.monotonic() - self.credits_started),
+            creditsPaused=self.credits_paused,
+            staticExport=self.static_export,
             title=s['title'],
             layout=s.get('layout', ''),
             body=s.get('body', ''),
@@ -253,6 +261,22 @@ class Controller(QObject):
                 + (f" — excerpt {slide['passage']}" if slide.get('passage') else '')
                 for i, slide in enumerate(self.timeline.slides)]
 
+    @Slot()
+    def restartCredits(self):
+        self.credits_saved = 0.0
+        self.credits_started = time.monotonic()
+        self.credits_paused = False
+        self.changed.emit()
+
+    @Slot()
+    def toggleCredits(self):
+        if self.credits_paused:
+            self.credits_started = time.monotonic()
+        else:
+            self.credits_saved += time.monotonic() - self.credits_started
+        self.credits_paused = not self.credits_paused
+        self.changed.emit()
+
     @Slot(int)
     def jumpToSlide(self, index):
         if 0 <= index < len(self.timeline.slides):
@@ -263,6 +287,7 @@ class Controller(QObject):
         if self.timeline.move(delta):
             logger.info('Slide %s/%s id=%s', self.timeline.index + 1, len(self.timeline.slides), self.timeline.slide.get('id', ''))
             self.reset_captions()
+            self.restartCredits()
         self.changed.emit()
 
     @Slot(str)

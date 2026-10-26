@@ -1,0 +1,22 @@
+# Draft only: all names and affiliations below are fictional.
+# Logos are existing project assets used as layout placeholders, not affiliations.
+# Logo paths are relative to this file. Restart the app after editing.
+speed: 24
+pause_seconds: 4
+heading: Sample credits — draft
+sections:
+  - heading: Research team
+    names: |-
+      Dr Alex Morgan
+      Example Institute of Listening
+    logo: ../src/cadenza/qml/assets/logos/cadenza.png
+  - heading: Concert team
+    names: |-
+      Jamie Ellis
+      Example Chamber Orchestra
+    logo: ../src/cadenza/qml/assets/logos/camerata.png
+  - heading: With support from
+    names: |-
+      Professor Sam Taylor
+      Example Research Foundation
+    logo: ../src/cadenza/qml/assets/logos/epsrc.png

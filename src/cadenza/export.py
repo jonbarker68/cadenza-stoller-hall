@@ -19,6 +19,7 @@ def export_pdf(show, destination, *, args=None):
     # but never launch audio or transcription for an export.
     options = argparse.Namespace(**vars(args)) if args is not None else argparse.Namespace()
     options.demo = True
+    options.static_export = True
     preview = bool(getattr(options, 'pdf_subtitles', False))
     controller = Controller(show, options)
     controller.timer.stop()  # No synthetic captions or advancing timers in the PDF.
