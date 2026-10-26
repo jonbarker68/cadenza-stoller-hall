@@ -3,20 +3,44 @@
 # Logo paths are relative to this file. Restart the app after editing.
 speed: 24
 pause_seconds: 4
-heading: Sample credits — draft
+heading: This event was brought to you by the Manchester Camerata in collaboration with the Cadenza Research Team
 sections:
-  - heading: Research team
+  - heading: Manchester Camerata
     names: |-
-      Dr Alex Morgan
-      Example Institute of Listening
-    logo: ../src/cadenza/qml/assets/logos/cadenza.png
-  - heading: Concert team
-    names: |-
-      Jamie Ellis
-      Example Chamber Orchestra
+      Gábor Takács-Nagy
+      Musical Director
     logo: ../src/cadenza/qml/assets/logos/camerata.png
-  - heading: With support from
+  - heading: Research team
+    names: ""
+    logo: ../src/cadenza/qml/assets/logos/cadenza.png
+  - heading: University of Salford
     names: |-
-      Professor Sam Taylor
-      Example Research Foundation
+      Professor Trevor Cox
+      Dr Bruno Fazenda
+      Dr Simone Graetzer
+      Dr Rebecca Vos
+      Dr Will Bailey
+    logo: ../src/cadenza/qml/assets/logos/salford.png
+  - heading: University of Leeds
+    names: |-
+      Professor Alinka Greasley
+      Dr Scott Banniser
+    logo: ../src/cadenza/qml/assets/logos/leeds.svg
+  - heading: University of Nottingham
+    names: |-
+      Professor Michael Akeroyd
+      Dr William M Whitmer
+      Dr Jenny ...
+    logo: ../src/cadenza/qml/assets/logos/nottingham.svg
+  - heading: University of Sheffield
+    names: |-
+      Professor Jon Barker 
+      Dr Gerardo Roa Dabike
+    logo: ../src/cadenza/qml/assets/logos/sheffield.svg
+  - heading: Funding
+    names: |-
+      This research was funded by the Engineering and Physical Sciences Research Council (EPSRC).
     logo: ../src/cadenza/qml/assets/logos/epsrc.png
+  - heading: Thank You
+    names: |-
+      Thank you for your participation in this research. Please complete the feedback survey at cadenzachallenge.org/camerata/survey. Your feedback is very important to us.

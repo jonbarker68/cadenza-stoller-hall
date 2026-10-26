@@ -57,7 +57,7 @@ Rectangle {
                 id: reel
                 objectName: "creditsReel"
                 width: parent.width
-                spacing: 24 * closing.scaleUnit
+                spacing: 56 * closing.scaleUnit
                 property real travel: height / closing.scaleUnit + 720
                 property real cycle: travel / closing.state.credits.speed + closing.state.credits.pause_seconds
                 y: closing.state.staticExport ? 35 * closing.scaleUnit

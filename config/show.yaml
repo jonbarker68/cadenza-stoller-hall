@@ -24,7 +24,7 @@ slides:
   layout: welcome
   kind: mc
   title: Welcome to the Cadenza Camerata Research Concert
-  body: 'Introduction from Dr Alinka Greasley, University of Leeds'
+  body: 'Introduction from Professor Alinka Greasley, University of Leeds'
   captions: true
   notes: 'Select AUTO for captions. Introduce the event and voluntary participation. Background questionnaire: pages
     3–4; definitions: page 5; research instructions: page 6. Hold here for Movement I, manually selecting OFF during
@@ -338,7 +338,7 @@ slides:
     Dr Bruno Fazenda
     University of Salford
   subtitle: |-
-    Dr Alinka Greasley
+    Professor Alinka Greasley
     University of Leeds
 
     Dr William Whitmer
@@ -352,7 +352,7 @@ slides:
       font_size: 60
     body:
       font_size: 36
-  notes: 'Q&A led by Professor Trevor Cox and Dr Alinka Greasely. Keep captions on AUTO. Advance to the feedback screen at the end of the session.'
+  notes: 'Q&A led by Professor Trevor Cox and Professor Alinka Greasely. Keep captions on AUTO. Advance to the feedback screen at the end of the session.'
 - id: closing-feedback
   kind: closing
   layout: closing-feedback
