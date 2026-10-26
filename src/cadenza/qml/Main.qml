@@ -36,13 +36,12 @@ ApplicationWindow {
     ColumnLayout {
         anchors.fill: parent; anchors.margins: 24; spacing: 12
         RowLayout {
+            Layout.minimumHeight: 36; Layout.maximumHeight: 36
             Label { text: "CADENZA"; font.pixelSize: 26; font.bold: true; Layout.fillWidth: true }
             Label { text: "Slide " + (operator.s.index+1) + " / " + operator.s.count; font.pixelSize: 18 }
         }
-        Slide { Layout.fillWidth: true; Layout.preferredHeight: width * 9/16; Layout.maximumHeight: 430 }
-        Label { text: "UP NEXT   " + operator.s.nextTitle; font.bold: true; Layout.fillWidth: true; elide: Text.ElideRight }
-        Label { text: operator.s.notes; wrapMode: Text.Wrap; Layout.fillWidth: true }
         RowLayout {
+            Layout.minimumHeight: 36; Layout.maximumHeight: 36
             Label { text: "Jump to slide" }
             ComboBox {
                 id: slidePicker
@@ -55,12 +54,59 @@ ApplicationWindow {
             }
         }
         RowLayout {
-            Button { text: "← Back"; enabled: operator.s.index > 0; onClicked: controller.move(-1) }
-            Button { text: "Next →"; enabled: operator.s.index < operator.s.count-1; highlighted: true; onClicked: controller.move(1) }
+            Layout.minimumHeight: 36; Layout.maximumHeight: 36
+            Button { objectName: "backButton"; Layout.preferredWidth: 110; text: "← Back"; enabled: operator.s.index > 0; onClicked: controller.move(-1) }
+            Button { objectName: "nextButton"; Layout.preferredWidth: 110; text: "Next →"; enabled: operator.s.index < operator.s.count-1; highlighted: true; onClicked: controller.move(1) }
             Item { Layout.fillWidth: true }
             Label { text: "Captions" }
             ComboBox { model: ["AUTO", "ON", "OFF"]; onActivated: controller.setOverride(currentText) }
             Label { text: operator.s.captions ? "Visible" : "Hidden" }
+        }
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.minimumHeight: 120
+            Slide {
+                anchors.centerIn: parent
+                width: Math.min(parent.width, parent.height * 16 / 9)
+                height: width * 9 / 16
+            }
+        }
+        Label {
+            text: "UP NEXT   " + operator.s.nextTitle
+            font.bold: true
+            Layout.fillWidth: true
+            Layout.minimumHeight: 24; Layout.maximumHeight: 24
+            elide: Text.ElideRight
+            ToolTip.visible: hovered
+            ToolTip.text: text
+            property bool hovered: nextHover.hovered
+            HoverHandler { id: nextHover }
+        }
+        ScrollView {
+            id: notesView
+            objectName: "operatorNotes"
+            Layout.fillWidth: true
+            Layout.minimumHeight: 80; Layout.maximumHeight: 80
+            clip: true
+            contentWidth: width - 24
+            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+            ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+            Label {
+                width: notesView.width - 24
+                text: operator.s.notes
+                wrapMode: Text.Wrap
+            }
+            Connections {
+                target: controller
+                function onChanged() {
+                    if (notesView.lastSlide !== operator.s.index) {
+                        notesView.contentItem.contentY = 0
+                        notesView.lastSlide = operator.s.index
+                    }
+                }
+            }
+            property int lastSlide: -1
         }
         RowLayout {
             Label { text: "Speaker colours" }
@@ -79,7 +125,9 @@ ApplicationWindow {
             }
         }
         RowLayout {
-            visible: operator.s.hasTimer
+            Layout.minimumHeight: 36; Layout.maximumHeight: 36
+            opacity: operator.s.hasTimer ? 1 : 0
+            enabled: operator.s.hasTimer
             Label { text: "Timer  " + operator.s.timerTime; font.family: "Menlo"; font.bold: true }
             Button { text: operator.s.timerAction; enabled: operator.s.timerActionEnabled; onClicked: controller.timerToggle() }
             Button { text: operator.s.timerSecondary; enabled: operator.s.timerSecondaryEnabled; onClicked: controller.timerStopRestart() }
