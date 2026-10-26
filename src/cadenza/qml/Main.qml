@@ -142,11 +142,12 @@ ApplicationWindow {
         RowLayout {
             Label { text: "Audience display" }
             ComboBox {
-                id: screens; Layout.fillWidth: true; model: Qt.application.screens
+                id: screens; objectName: "audienceScreenSelector"; Layout.fillWidth: true; model: Qt.application.screens
                 textRole: "name"
+                onActivated: controller.presentAudience(audience, currentIndex, audience.visibility === Window.FullScreen)
             }
-            Button { text: "Present full screen"; onClicked: { audience.screen = Qt.application.screens[screens.currentIndex]; audience.showFullScreen(); } }
-            Button { text: "Windowed"; onClicked: { audience.showNormal(); audience.raise(); operator.raise(); } }
+            Button { objectName: "presentFullScreenButton"; text: "Present full screen"; onClicked: { controller.presentAudience(audience, screens.currentIndex, true); } }
+            Button { objectName: "audienceWindowedButton"; text: "Windowed"; onClicked: { controller.presentAudience(audience, screens.currentIndex, false); operator.raise(); } }
         }
         Label { text: operator.s.status; wrapMode: Text.Wrap; Layout.fillWidth: true; color: operator.s.error ? "#a12424" : "#40576a" }
         Label { text: "Log: " + operator.s.logPath; visible: operator.s.logPath.length > 0; font.pixelSize: 12; Layout.fillWidth: true; elide: Text.ElideMiddle }
@@ -155,9 +156,9 @@ ApplicationWindow {
         id: audience
         title: "Cadenza · Audience"; visible: true; width: 1280; height: 720
         color: DisplayStyle.background
-        onClosing: audience.hide()
+        onClosing: { controller.cancelAudiencePresentation(); audience.hide(); }
         Slide { anchors.fill: parent }
-        Shortcut { sequence: "Escape"; onActivated: { audience.showNormal(); operator.raise(); } }
+        Shortcut { sequence: "Escape"; onActivated: { controller.cancelAudiencePresentation(); audience.showNormal(); operator.raise(); } }
         Shortcut { sequence: "Right"; onActivated: controller.move(1) }
         Shortcut { sequence: "Left"; onActivated: controller.move(-1) }
         Shortcut { sequence: "Space"; onActivated: controller.move(1) }

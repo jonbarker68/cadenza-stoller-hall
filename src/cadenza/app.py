@@ -13,6 +13,7 @@ from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuickControls2 import QQuickStyle
 
 from .model import Timeline, timer_text, load_show
+from .displays import AudienceDisplay
 
 logger = logging.getLogger("cadenza")
 
@@ -22,6 +23,7 @@ class Controller(QObject):
 
     def __init__(self, show, args):
         super().__init__()
+        self.audience_display = AudienceDisplay(self)
         self.timeline = Timeline(show['slides'])
         self.show = show
         self.credits_started = time.monotonic()
@@ -260,6 +262,14 @@ class Controller(QObject):
         return [f"{i + 1}. {slide['title']}"
                 + (f" — excerpt {slide['passage']}" if slide.get('passage') else '')
                 for i, slide in enumerate(self.timeline.slides)]
+
+    @Slot(QObject, int, bool)
+    def presentAudience(self, window, index, fullscreen):
+        self.audience_display.present(window, index, fullscreen)
+
+    @Slot()
+    def cancelAudiencePresentation(self):
+        self.audience_display.cancel()
 
     @Slot()
     def restartCredits(self):
