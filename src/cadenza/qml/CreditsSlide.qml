@@ -2,6 +2,30 @@ import QtQuick
 
 Rectangle {
     id: closing
+    objectName: "creditsScreen"
+    property real pdfOffset: 0
+    property real pdfPageHeight: 650
+    function pdfMetrics() {
+        var atoms = [], groups = []
+        function textLines(item, origin) {
+            if (!item.text.length || !item.lineCount) return
+            var step = item.contentHeight / item.lineCount
+            for (var n = 0; n < item.lineCount; n++)
+                atoms.push([origin + item.y / scaleUnit + n * step / scaleUnit,
+                            origin + item.y / scaleUnit + (n + 1) * step / scaleUnit])
+        }
+        textLines(creditsHeading, 0)
+        for (var i = 0; i < sections.count; i++) {
+            var group = sections.itemAt(i), origin = group.y / scaleUnit
+            groups.push([origin, origin + group.height / scaleUnit])
+            textLines(group.children[0], origin)
+            textLines(group.children[1], origin)
+            var logo = group.children[2]
+            if (logo.visible) atoms.push([origin + logo.y / scaleUnit,
+                                         origin + (logo.y + logo.height) / scaleUnit])
+        }
+        return JSON.stringify({atoms: atoms, groups: groups})
+    }
     property real scaleUnit: 1
     property var state: controller.state
     color: "#101f19"
@@ -51,7 +75,8 @@ Rectangle {
             objectName: "creditsViewport"
             x: 705 * closing.scaleUnit
             width: 540 * closing.scaleUnit
-            height: parent.height
+            y: closing.state.staticExport ? 35 * closing.scaleUnit : 0
+            height: closing.state.staticExport ? closing.pdfPageHeight * closing.scaleUnit : parent.height
             clip: true
             Column {
                 id: reel
@@ -60,9 +85,10 @@ Rectangle {
                 spacing: 56 * closing.scaleUnit
                 property real travel: height / closing.scaleUnit + 720
                 property real cycle: travel / closing.state.credits.speed + closing.state.credits.pause_seconds
-                y: closing.state.staticExport ? 35 * closing.scaleUnit
+                y: closing.state.staticExport ? -closing.pdfOffset * closing.scaleUnit
                    : (720 - Math.min(travel, (closing.state.creditsElapsed % cycle) * closing.state.credits.speed)) * closing.scaleUnit
                 Text {
+                    id: creditsHeading
                     width: parent.width
                     text: closing.state.credits.heading
                     textFormat: Text.PlainText
@@ -71,6 +97,7 @@ Rectangle {
                     color: "#f49bce"; font.pixelSize: 30 * closing.scaleUnit
                 }
                 Repeater {
+                    id: sections
                     model: closing.state.credits.sections
                     Column {
                         width: reel.width
