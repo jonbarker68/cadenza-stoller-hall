@@ -76,6 +76,9 @@ def load_show(path):
             credits = yaml.safe_load(stream)
         if not isinstance(credits, dict) or not isinstance(credits.get('sections'), list):
             raise ValueError('Credits must contain a sections list')
+        if credits.get('theme', 'dark') not in ('white', 'dark'):
+            raise ValueError('Credits theme must be white or dark')
+        credits.setdefault('theme', 'dark')
         for key, default in (('speed', 24), ('pause_seconds', 4)):
             value = credits.get(key, default)
             if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value <= 0:
@@ -84,6 +87,10 @@ def load_show(path):
         for section in credits['sections']:
             if not isinstance(section, dict) or not all(isinstance(section.get(k), str) for k in ('heading', 'names')):
                 raise ValueError('Every credit section needs heading and names text')
+            for key in ('logo_width', 'logo_height'):
+                value = section.get(key, 1)
+                if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not 0 < value <= 540:
+                    raise ValueError(f'Credit {key} must be positive and at most 540')
             if section.get('logo'):
                 logo = (credits_path.parent / section['logo']).resolve()
                 if not logo.is_file():

@@ -353,12 +353,6 @@ slides:
     body:
       font_size: 36
   notes: 'Q&A led by Professor Trevor Cox and Professor Alinka Greasely. Keep captions on AUTO. Advance to the feedback screen at the end of the session.'
-- id: closing-feedback
-  kind: closing
-  layout: closing-feedback
-  title: Thank you for taking part
-  captions: true
-  notes: 'Original closing slide with QR code and room for subtitles. Stay here to finish with this version, or advance once for the alternative scrolling credits.'
 - id: closing-credits
   kind: closing
   layout: closing-credits

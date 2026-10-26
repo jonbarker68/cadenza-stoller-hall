@@ -18,9 +18,9 @@ Rectangle {
         for (var i = 0; i < sections.count; i++) {
             var group = sections.itemAt(i), origin = group.y / scaleUnit
             groups.push([origin, origin + group.height / scaleUnit])
-            textLines(group.children[0], origin)
-            textLines(group.children[1], origin)
-            var logo = group.children[2]
+            textLines(group.headingItem, origin)
+            textLines(group.namesItem, origin)
+            var logo = group.logoItem
             if (logo.visible) atoms.push([origin + logo.y / scaleUnit,
                                          origin + (logo.y + logo.height) / scaleUnit])
         }
@@ -28,6 +28,11 @@ Rectangle {
     }
     property real scaleUnit: 1
     property var state: controller.state
+    readonly property bool whiteCredits: state.credits.theme === "white"
+    readonly property color creditsBackground: whiteCredits ? "#ffffff" : "#101f19"
+    readonly property color creditsHeadingColor: whiteCredits ? "#174b36" : "#b4ef50"
+    readonly property color creditsNameColor: whiteCredits ? "#253c32" : "#f4f6e9"
+    readonly property color creditsIntroColor: whiteCredits ? "#913567" : "#f49bce"
     color: "#101f19"
     Item {
         width: 1280 * closing.scaleUnit
@@ -66,6 +71,12 @@ Rectangle {
             }
         }
         Rectangle {
+            x: 674 * closing.scaleUnit
+            width: parent.width - x
+            height: parent.height
+            color: closing.creditsBackground
+        }
+        Rectangle {
             x: 672 * closing.scaleUnit; y: 35 * closing.scaleUnit
             width: 2 * closing.scaleUnit; height: 650 * closing.scaleUnit
             color: "#b4ef50"; opacity: 0.45
@@ -82,7 +93,7 @@ Rectangle {
                 id: reel
                 objectName: "creditsReel"
                 width: parent.width
-                spacing: 56 * closing.scaleUnit
+                spacing: 64 * closing.scaleUnit
                 property real travel: height / closing.scaleUnit + 720
                 property real cycle: travel / closing.state.credits.speed + closing.state.credits.pause_seconds
                 y: closing.state.staticExport ? -closing.pdfOffset * closing.scaleUnit
@@ -94,36 +105,44 @@ Rectangle {
                     textFormat: Text.PlainText
                     wrapMode: Text.Wrap
                     horizontalAlignment: Text.AlignHCenter
-                    color: "#f49bce"; font.pixelSize: 30 * closing.scaleUnit
+                    color: closing.creditsIntroColor; font.pixelSize: 30 * closing.scaleUnit
                 }
                 Repeater {
                     id: sections
                     model: closing.state.credits.sections
                     Column {
                         width: reel.width
-                        spacing: 8 * closing.scaleUnit
+                        spacing: 20 * closing.scaleUnit
+                        property alias headingItem: groupHeading
+                        property alias logoItem: groupLogo
+                        property alias namesItem: groupNames
                         Text {
+                            id: groupHeading
                             width: parent.width; text: modelData.heading
                             textFormat: Text.PlainText; wrapMode: Text.Wrap
                             horizontalAlignment: Text.AlignHCenter
-                            color: "#b4ef50"; font.pixelSize: 30 * closing.scaleUnit
-                        }
-                        Text {
-                            width: parent.width; text: modelData.names
-                            textFormat: Text.PlainText; wrapMode: Text.Wrap
-                            horizontalAlignment: Text.AlignHCenter
-                            color: "#f4f6e9"; font.pixelSize: 28 * closing.scaleUnit
+                            color: closing.creditsHeadingColor; font.pixelSize: 30 * closing.scaleUnit
                         }
                         Rectangle {
+                            id: groupLogo
                             visible: !!modelData.logo
                             anchors.horizontalCenter: parent.horizontalCenter
-                            width: 320 * closing.scaleUnit; height: 65 * closing.scaleUnit
+                            width: (modelData.logo_width || 320) * closing.scaleUnit
+                            height: (modelData.logo_height || 80) * closing.scaleUnit
                             color: "white"; radius: 3 * closing.scaleUnit
                             Image {
                                 anchors.fill: parent; anchors.margins: 6 * closing.scaleUnit
                                 source: modelData.logo || ""
                                 fillMode: Image.PreserveAspectFit
                             }
+                        }
+                        Text {
+                            id: groupNames
+                            visible: text.length > 0
+                            width: parent.width; text: modelData.names
+                            textFormat: Text.PlainText; wrapMode: Text.Wrap
+                            horizontalAlignment: Text.AlignHCenter
+                            color: closing.creditsNameColor; font.pixelSize: 28 * closing.scaleUnit
                         }
                     }
                 }
@@ -132,8 +151,8 @@ Rectangle {
                 width: parent.width; height: 55 * closing.scaleUnit
                 visible: !closing.state.staticExport
                 gradient: Gradient {
-                    GradientStop { position: 0; color: "#101f19" }
-                    GradientStop { position: 1; color: "#00101f19" }
+                    GradientStop { position: 0; color: closing.creditsBackground }
+                    GradientStop { position: 1; color: Qt.rgba(closing.creditsBackground.r, closing.creditsBackground.g, closing.creditsBackground.b, 0) }
                 }
             }
             Rectangle {
@@ -141,8 +160,8 @@ Rectangle {
                 width: parent.width; height: 55 * closing.scaleUnit
                 visible: !closing.state.staticExport
                 gradient: Gradient {
-                    GradientStop { position: 0; color: "#00101f19" }
-                    GradientStop { position: 1; color: "#101f19" }
+                    GradientStop { position: 0; color: Qt.rgba(closing.creditsBackground.r, closing.creditsBackground.g, closing.creditsBackground.b, 0) }
+                    GradientStop { position: 1; color: closing.creditsBackground }
                 }
             }
         }

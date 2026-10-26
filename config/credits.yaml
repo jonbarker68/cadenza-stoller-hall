@@ -1,6 +1,9 @@
 # Draft only: all names and affiliations below are fictional.
 # Logos are existing project assets used as layout placeholders, not affiliations.
 # Logo paths are relative to this file. Restart the app after editing.
+# Credits column background: white or dark. Restart the app after changing.
+# Optional logo_width / logo_height set each logo’s display box (reference pixels).
+theme: white
 speed: 24
 pause_seconds: 4
 heading: This event was brought to you by the Manchester Camerata in collaboration with the Cadenza Research Team
@@ -21,26 +24,34 @@ sections:
       Dr Rebecca Vos
       Dr Will Bailey
     logo: ../src/cadenza/qml/assets/logos/salford.png
+    logo_width: 240
+    logo_height: 100
   - heading: University of Leeds
+    logo: ../src/cadenza/qml/assets/logos/leeds.svg
+    logo_width: 220
+    logo_height: 60
     names: |-
       Professor Alinka Greasley
       Dr Scott Banniser
-    logo: ../src/cadenza/qml/assets/logos/leeds.svg
   - heading: University of Nottingham
     names: |-
       Professor Michael Akeroyd
       Dr William M Whitmer
-      Dr Jenny ...
+      Dr Jenny Firth
     logo: ../src/cadenza/qml/assets/logos/nottingham.svg
+    logo_width: 300
+    logo_height: 110
   - heading: University of Sheffield
     names: |-
       Professor Jon Barker 
       Dr Gerardo Roa Dabike
     logo: ../src/cadenza/qml/assets/logos/sheffield.svg
+    logo_width: 280
+    logo_height: 112
   - heading: Funding
     names: |-
       This research was funded by the Engineering and Physical Sciences Research Council (EPSRC).
     logo: ../src/cadenza/qml/assets/logos/epsrc.png
   - heading: Thank You
     names: |-
-      Thank you for your participation in this research. Please complete the feedback survey at cadenzachallenge.org/camerata/survey. Your feedback is very important to us.
+      Thank you for your participation in this research. Please complete the post-event survey. Your feedback is very important to us.
