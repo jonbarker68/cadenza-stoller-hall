@@ -52,6 +52,15 @@ slides:
   kind: mc
   title: Movement I 
   body: 'Just sit back and enjoy!' 
+  style:
+    alignment: center
+    spacing: 22
+    title:
+      font_size: 64
+      bold: true
+    body:
+      font_size: 30
+      italic: true
   captions: false
   notes: ''
 - id: activity-introduction
@@ -67,6 +76,11 @@ slides:
 - id: excerpt-1
   kind: experiment
   title: Please turn to page 7
+  subtitle: Loudness
+  style:
+    subtitle:
+      font_size: 60
+      italic: true
   passage: '1'
   page: 7
   captions: true
@@ -84,6 +98,11 @@ slides:
 - id: excerpt-2
   kind: experiment
   title: Please turn to page 8
+  subtitle: Loudness
+  style:
+    subtitle:
+      font_size: 60
+      italic: true
   passage: '2'
   page: 8
   captions: true
@@ -101,6 +120,11 @@ slides:
 - id: excerpt-3
   kind: experiment
   title: Please turn to page 9
+  subtitle: Clarity
+  style:
+    subtitle:
+      font_size: 60
+      italic: true
   passage: '3'
   page: 9
   captions: true
@@ -118,6 +142,11 @@ slides:
 - id: excerpt-4
   kind: experiment
   title: Please turn to page 10
+  subtitle: Clarity
+  style:
+    subtitle:
+      font_size: 60
+      italic: true
   passage: '4'
   page: 10
   captions: true
@@ -135,6 +164,11 @@ slides:
 - id: excerpt-5
   kind: experiment
   title: Please turn to page 11
+  subtitle: Loudness and distortion
+  style:
+    subtitle:
+      font_size: 60
+      italic: true
   passage: '5'
   page: 11
   captions: true
@@ -152,6 +186,11 @@ slides:
 - id: excerpt-6
   kind: experiment
   title: Please turn to page 12
+  subtitle: Loudness and distortion
+  style:
+    subtitle:
+      font_size: 60
+      italic: true
   passage: '6'
   page: 12
   captions: true
@@ -169,6 +208,11 @@ slides:
 - id: excerpt-7
   kind: experiment
   title: Please turn to page 13
+  subtitle: Frequency balance and harshness
+  style:
+    subtitle:
+      font_size: 60
+      italic: true
   passage: '7'
   page: 13
   captions: true
@@ -186,6 +230,11 @@ slides:
 - id: excerpt-8
   kind: experiment
   title: Please turn to page 14
+  subtitle: Frequency balance and harshness
+  style:
+    subtitle:
+      font_size: 60
+      italic: true
   passage: '8'
   page: 14
   captions: true
@@ -203,6 +252,11 @@ slides:
 - id: excerpt-9
   kind: experiment
   title: Please turn to page 15
+  subtitle: Clarity
+  style:
+    subtitle:
+      font_size: 60
+      italic: true
   passage: '9'
   page: 15
   captions: true
@@ -220,6 +274,11 @@ slides:
 - id: excerpt-10
   kind: experiment
   title: Please turn to page 16
+  subtitle: Clarity
+  style:
+    subtitle:
+      font_size: 60
+      italic: true
   passage: '10'
   page: 16
   captions: true
