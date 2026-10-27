@@ -12,7 +12,15 @@ sections:
     names: |-
       Gábor Takács-Nagy
       Musical Director
+
+      Clara Marshall Cawley
+      Lachlan Banner
     logo: ../src/cadenza/qml/assets/logos/camerata.png
+  - heading: Stoller Hall
+    names: |-
+      Chris Burke
+      Forest Williams
+    logo: ../src/cadenza/qml/assets/logos/stollerhall.webp
   - heading: Research team
     names: ""
     logo: ../src/cadenza/qml/assets/logos/cadenza.png
@@ -48,6 +56,12 @@ sections:
     logo: ../src/cadenza/qml/assets/logos/sheffield.svg
     logo_width: 280
     logo_height: 112
+  - heading: Supporters
+    names: |-
+      Alastair Moore
+      Aaron Coles
+      Jamie Scanlan
+    logo: ../src/cadenza/qml/assets/logos/rnid.jpg
   - heading: Funding
     names: |-
       This research was funded by the Engineering and Physical Sciences Research Council (EPSRC).
