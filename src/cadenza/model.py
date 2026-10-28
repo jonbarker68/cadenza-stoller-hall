@@ -85,8 +85,24 @@ def load_show(path):
                 raise ValueError(f'Credits {key} must be positive and finite')
             credits[key] = value
         for section in credits['sections']:
-            if not isinstance(section, dict) or not all(isinstance(section.get(k), str) for k in ('heading', 'names')):
-                raise ValueError('Every credit section needs heading and names text')
+            if not isinstance(section, dict) or not isinstance(section.get('heading'), str):
+                raise ValueError('Every credit section needs heading text')
+            if 'people' in section:
+                if 'names' in section or not isinstance(section['people'], list):
+                    raise ValueError('Use either people list or names text in a credit section')
+                entries = []
+                for person in section['people']:
+                    if (not isinstance(person, dict) or not isinstance(person.get('name'), str)
+                            or not person['name'].strip() or not isinstance(person.get('role', ''), str)):
+                        raise ValueError('Every credit person needs a name and optional role text')
+                    entries.append({'name': person['name'], 'role': person.get('role', '')})
+            else:
+                if not isinstance(section.get('names', ''), str):
+                    raise ValueError('Credit names must be text')
+                entries = [{'name': line, 'role': ''} for line in section.get('names', '').split('\n')]
+                if not section.get('names', ''):
+                    entries = []
+            section['entries'] = entries
             for key in ('logo_width', 'logo_height'):
                 value = section.get(key, 1)
                 if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not 0 < value <= 540:

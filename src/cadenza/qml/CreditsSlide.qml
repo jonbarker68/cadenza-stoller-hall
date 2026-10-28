@@ -19,7 +19,13 @@ Rectangle {
             var group = sections.itemAt(i), origin = group.y / scaleUnit
             groups.push([origin, origin + group.height / scaleUnit])
             textLines(group.headingItem, origin)
-            textLines(group.namesItem, origin)
+            var names = group.namesItem
+            for (var n = 0; n < names.entries.count; n++) {
+                var person = names.entries.itemAt(n)
+                var personOrigin = origin + (names.y + person.y) / scaleUnit
+                textLines(person.nameItem, personOrigin)
+                textLines(person.roleItem, personOrigin)
+            }
             var logo = group.logoItem
             if (logo.visible) atoms.push([origin + logo.y / scaleUnit,
                                          origin + (logo.y + logo.height) / scaleUnit])
@@ -136,13 +142,40 @@ Rectangle {
                                 fillMode: Image.PreserveAspectFit
                             }
                         }
-                        Text {
+                        Column {
                             id: groupNames
-                            visible: text.length > 0
-                            width: parent.width; text: modelData.names
-                            textFormat: Text.PlainText; wrapMode: Text.Wrap
-                            horizontalAlignment: Text.AlignHCenter
-                            color: closing.creditsNameColor; font.pixelSize: 28 * closing.scaleUnit
+                            visible: people.count > 0
+                            width: parent.width
+                            property alias entries: people
+                            Repeater {
+                                id: people
+                                model: modelData.entries
+                                Column {
+                                    width: groupNames.width
+                                    spacing: 3 * closing.scaleUnit
+                                    property alias nameItem: personName
+                                    property alias roleItem: personRole
+                                    Text {
+                                        id: personName
+                                        width: parent.width; text: modelData.name
+                                        height: text.length ? implicitHeight : 14 * closing.scaleUnit
+                                        textFormat: Text.PlainText; wrapMode: Text.Wrap
+                                        horizontalAlignment: Text.AlignHCenter
+                                        color: closing.creditsNameColor; font.pixelSize: 28 * closing.scaleUnit
+                                    }
+                                    Text {
+                                        id: personRole
+                                        objectName: "creditRole"
+                                        visible: text.length > 0
+                                        width: parent.width; text: modelData.role
+                                        textFormat: Text.PlainText; wrapMode: Text.Wrap
+                                        horizontalAlignment: Text.AlignHCenter
+                                        color: closing.creditsNameColor
+                                        font.pixelSize: 24 * closing.scaleUnit; font.italic: true
+                                    }
+                                    Item { width: 1; height: 12 * closing.scaleUnit; visible: personRole.visible }
+                                }
+                            }
                         }
                     }
                 }

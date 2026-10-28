@@ -3,18 +3,18 @@
 # Logo paths are relative to this file. Restart the app after editing.
 # Credits column background: white or dark. Restart the app after changing.
 # Optional logo_width / logo_height set each logo’s display box (reference pixels).
+# Use people: [{name: ..., role: ...}] when someone needs a role beneath their name.
 theme: white
 speed: 24
 pause_seconds: 4
-heading: This event was brought to you by the Manchester Camerata in collaboration with the Cadenza Research Team
+heading: This event was brought to you by the Cadenza Research Team in collaboration with the Manchester Camerata
 sections:
   - heading: Manchester Camerata
-    names: |-
-      Gábor Takács-Nagy
-      Musical Director
-
-      Clara Marshall Cawley
-      Lachlan Banner
+    people:
+      - name: Gábor Takács-Nagy
+        role: Musical Director
+      - name: Clara Marshall Cawley
+      - name: Lachlan Banner
     logo: ../src/cadenza/qml/assets/logos/camerata.png
   - heading: Stoller Hall
     names: |-
