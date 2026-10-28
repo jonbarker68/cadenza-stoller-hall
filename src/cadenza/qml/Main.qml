@@ -59,7 +59,7 @@ ApplicationWindow {
             Button { objectName: "nextButton"; Layout.preferredWidth: 110; text: "Next →"; enabled: operator.s.index < operator.s.count-1; highlighted: true; onClicked: controller.move(1) }
             Item { Layout.fillWidth: true }
             Label { text: "Captions" }
-            ComboBox { model: ["AUTO", "ON", "OFF"]; onActivated: controller.setOverride(currentText) }
+            ComboBox { model: ["AUTO", "ON", "OFF"]; currentIndex: model.indexOf(operator.s.override); onActivated: controller.setOverride(currentText) }
             Label { text: operator.s.captions ? "Visible" : "Hidden" }
         }
         Item {
@@ -149,6 +149,13 @@ ApplicationWindow {
             Button { objectName: "presentFullScreenButton"; text: "Present full screen"; onClicked: { controller.presentAudience(audience, screens.currentIndex, true); } }
             Button { objectName: "audienceWindowedButton"; text: "Windowed"; onClicked: { controller.presentAudience(audience, screens.currentIndex, false); operator.raise(); } }
         }
+        RowLayout {
+            Layout.minimumHeight: 36; Layout.maximumHeight: 36
+            Button { objectName: "restartCaptionsButton"; text: "Restart captions"; enabled: operator.s.captionRestartAvailable; onClicked: controller.restartCaptions() }
+            Button { text: "Clear captions"; onClicked: controller.clearCaptions() }
+            Label { text: operator.s.captionActivity; Layout.fillWidth: true; elide: Text.ElideRight }
+        }
+        Label { text: operator.s.recoveryStatus; visible: text.length > 0; wrapMode: Text.Wrap; Layout.fillWidth: true; color: "#40576a" }
         Label { text: operator.s.status; wrapMode: Text.Wrap; Layout.fillWidth: true; color: operator.s.error ? "#a12424" : "#40576a" }
         Label { text: "Log: " + operator.s.logPath; visible: operator.s.logPath.length > 0; font.pixelSize: 12; Layout.fillWidth: true; elide: Text.ElideMiddle }
     }

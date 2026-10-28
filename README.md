@@ -27,10 +27,10 @@ cd /Users/jon/projects/cadenza-stoller-hall
 ./start-event
 ```
 
-This launches the presentation with **live microphone captions and speaker diarization enabled**, using your local `config/caption-config.yaml`. The shortcut runs:
+This launches the presentation with **live microphone captions and speaker diarization enabled**, using your local `config/caption-config.yaml`. It saves progress, resumes the last saved slide on relaunch, and uses macOS `caffeinate` to prevent idle display/system sleep while the app is running. The shortcut runs:
 
 ```sh
-uv run cadenza --live --caption-config ./config/caption-config.yaml --diarization speaker
+uv run cadenza --live --caption-config ./config/caption-config.yaml --diarization speaker --resume
 ```
 
 From another directory, you can run `/Users/jon/projects/cadenza-stoller-hall/start-event` directly; it automatically uses the project directory. Extra options can be appended, for example `./start-event --caption-config /path/to/another.yaml`. Use `./start-event --help` to see the available options without starting the event.
@@ -38,6 +38,23 @@ From another directory, you can run `/Users/jon/projects/cadenza-stoller-hall/st
 Speaker diarization identifies different speakers. Caption colours follow your configured display policy; use **Speaker colours → SPEAKERS** on the control panel to display them, or **WHITE** for white captions. Select the audience monitor and click **Present full screen** when ready. Closing the operator window stops the presentation and live caption worker.
 
 Before using the shortcut for the first time, complete the setup below (`uv sync`, the local caption configuration/API key, the live-caption environment, and microphone permission).
+
+## Event-day recovery
+
+| Problem | Recovery |
+| --- | --- |
+| Captions stop, the worker crashes, or audio/network settings need reconnecting | Click **Restart captions**. Only the caption worker is restarted; the current slide, caption visibility setting and presentation timer stay in place. A stuck worker is terminated after 2.5 seconds. Restart opens a new transcription session, so speaker identities/colours can be reassigned. |
+| Incorrect or stale caption text | Click **Clear captions**; transcription continues. **OFF** hides captions while you investigate. |
+| Whole app crashes or closes | Run `./start-event` again. The last saved slide and caption overrides are restored. Running timers return **paused**, ready for **Resume**. The old caption worker also exits if its parent app dies. Check the audience display, select the venue monitor, then **Present full screen**. |
+| Starting a new rehearsal or the actual event from the beginning | Run `./start-event --fresh-start`. This replaces the saved position with slide 1. |
+| Caption setup, microphone or online transcription is unusable | Run `./start-event --slides-only`. It restores the saved slide and runs the presentation without microphone capture, transcription or demo text. To restore live captions, close it and run `./start-event` again. |
+| Audience screen disappears or the cable is reconnected | Reconnect it, select the audience monitor, then **Present full screen**. The slide dropdown can recover the required slide at any time. |
+
+Checkpoints are written atomically to `logs/event-state.json` on slide/control changes and approximately once a second while running. They contain slide ID, timer elapsed time and caption display choices, with no transcript or API key. After a crash, up to about one second of timer progress may be lost; time while the app was closed is not added. Saved slides are matched by ID, so reordering the programme is supported. A missing checkpoint starts at slide 1; a corrupt checkpoint or removed slide also falls back to slide 1 with an operator message. Changed timer definitions restart their timer rather than applying incompatible saved timing. PDF export never reads or changes the recovery checkpoint. `uv run cadenza` without `--resume` continues to start at slide 1.
+
+The operator panel shows caption errors and time since the last speech text received. Silence during music is normal and does not trigger a restart. After a restart, check that new speech is being received. A restart cannot repair an unplugged microphone, missing permission, invalid API credentials or an unavailable internet connection; resolve the cause first. Logs are in `logs/cadenza.log`.
+
+Before the event, run a short live microphone test, check the actual audience screen, power the laptop from mains, and have a local copy of `output/cadenza-review.pdf` available as a basic slide fallback. Keep a usable internet connection for live transcription. The launcher prevents **idle** sleep; manually sleeping the laptop or closing its lid can still interrupt the event. Recovery requires rerunning the shortcut; the app does not repeatedly relaunch itself.
 
 ## Run now
 

@@ -11,6 +11,9 @@ older consumers. The native live-caption overlay is never imported.
 import argparse
 import contextlib
 import json
+import os
+import threading
+import time
 from pathlib import Path
 import queue
 import signal
@@ -26,7 +29,16 @@ def main():
     parser.add_argument("--diarization", choices=("none", "speaker"))
     parser.add_argument("--speaker-colours", choices=("white", "speakers"))
     parser.add_argument("--vocabulary", "--vocabulary-file")
+    parser.add_argument('--parent-pid', type=int, help=argparse.SUPPRESS)
     args = parser.parse_args()
+    if args.parent_pid is not None:
+        def watch_parent():
+            # The GUI may crash while audio/network threads are still active.
+            # Exit the worker too, releasing its microphone and connection.
+            while os.getppid() == args.parent_pid:
+                time.sleep(0.5)
+            os._exit(0)
+        threading.Thread(target=watch_parent, daemon=True).start()
     root, config_path, replay_path = args.root, args.config_path, args.replay_path
     raw_output = args.raw
     sys.path.insert(0, str(Path(root) / "src"))

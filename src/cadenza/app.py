@@ -1,6 +1,7 @@
 import argparse
 import json
 import math
+import os
 import logging
 from pathlib import Path
 import sys
@@ -14,6 +15,7 @@ from PySide6.QtQuickControls2 import QQuickStyle
 
 from .model import Timeline, timer_text, load_show
 from .displays import AudienceDisplay
+from .recovery import EventCheckpoint
 
 logger = logging.getLogger("cadenza")
 
@@ -68,11 +70,34 @@ class Controller(QObject):
         self.stderr_tail = ''
         self.closing = False
         self.received_caption = False
+        self.last_caption_event = None
         self.log_path = str(getattr(args, 'log_path', ''))
         self.process = None
-        self.demo = args.demo
+        self.caption_command = None
+        self.restarting_captions = False
+        self.restart_kill_timer = QTimer(self)
+        self.restart_kill_timer.setSingleShot(True)
+        self.restart_kill_timer.timeout.connect(self.kill_caption_source)
+        self.checkpoint = None
+        self.recovery_status = ''
+        self.last_checkpoint = 0.0
+        if getattr(args, 'resume', False) and not self.static_export:
+            self.checkpoint = EventCheckpoint(getattr(args, 'state_file', 'logs/event-state.json'), args.show)
+            if not getattr(args, 'fresh_start', False):
+                try:
+                    self.recovery_status = self.checkpoint.restore(self.timeline)
+                    self.override = self.checkpoint.preferences.get('override', 'AUTO')
+                    self.speaker_override = self.checkpoint.preferences.get('speaker_override', 'AUTO')
+                except (OSError, ValueError, TypeError, AttributeError) as exc:
+                    self.recovery_status = 'Could not restore saved position; starting at slide 1. ' + str(exc)
+                    logger.warning('%s', self.recovery_status)
+            self.persist_checkpoint()
+
+        self.demo = args.demo and not getattr(args, 'slides_only', False)
         self.demo_index = 0
         self.last_demo = time.monotonic()
+        if getattr(args, 'slides_only', False):
+            self.status = 'Slides only · microphone and live captions disabled' 
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.tick)
@@ -89,29 +114,72 @@ class Controller(QObject):
             interpreter = root / '.venv/bin/python'
             config = str(Path(args.caption_config).expanduser().resolve())
 
-            logger.info('Caption source: interpreter=%s config=%s mode=%s', interpreter, config, 'replay' if args.replay else 'live')
-            if not interpreter.exists():
-                self.status = (
-                    'Caption interpreter missing: ' + str(interpreter)
-                )
-                self.error = True
-                logger.error('%s', self.status)
-            else:
-                self.status = 'Starting caption source…'
-                self.process.start(
-                    str(interpreter),
-                    [
+            self.caption_command = (str(interpreter), [
                         str(Path(__file__).with_name('bridge.py')),
                         str(root),
                         config,
                         args.replay or '',
-                        '--raw',
+                        '--raw', '--parent-pid', str(os.getpid()),
                         *(['--diarization', args.diarization] if getattr(args, 'diarization', None) is not None else []),
                         *(['--speaker-colours', args.speaker_colours] if getattr(args, 'speaker_colours', None) is not None else []),
                         *(['--vocabulary', str(Path(args.vocabulary).expanduser().resolve())]
                           if getattr(args, 'vocabulary', None) is not None else []),
-                    ],
-                )
+                    ])
+            self.start_caption_source()
+
+    def persist_checkpoint(self):
+        if self.checkpoint is not None:
+            try:
+                self.checkpoint.save(self.timeline, self.override, self.speaker_override)
+                self.last_checkpoint = time.monotonic()
+            except (OSError, ValueError, TypeError) as exc:
+                self.recovery_status = 'Recovery save failed: ' + str(exc)
+                logger.warning('%s', self.recovery_status)
+                self.last_checkpoint = time.monotonic()
+
+    def start_caption_source(self):
+        if self.closing or self.caption_command is None:
+            return
+        self.restart_kill_timer.stop()
+        self.restarting_captions = False
+        self.buffer = self.stderr_buffer = b''
+        self.stderr_tail = ''
+        self.received_caption = False
+        self.last_caption_event = None
+        self.error = False
+        self.reset_captions()
+        interpreter, arguments = self.caption_command
+        if not Path(interpreter).exists():
+            self.ingest('error', 'Caption interpreter missing: ' + interpreter)
+            return
+        self.status = 'Starting caption source…'
+        logger.info('Starting caption source: interpreter=%s', interpreter)
+        self.process.start(interpreter, arguments)
+        self.changed.emit()
+
+    @Slot()
+    def restartCaptions(self):
+        if self.closing or self.process is None or self.restarting_captions:
+            return
+        self.reset_captions()
+        self.restarting_captions = True
+        self.status = 'Restarting captions…'
+        self.error = False
+        if self.process.state() == QProcess.NotRunning:
+            self.start_caption_source()
+        else:
+            self.process.terminate()
+            self.restart_kill_timer.start(2500)
+        self.changed.emit()
+
+    def kill_caption_source(self):
+        if self.restarting_captions and self.process is not None:
+            self.process.kill()
+
+    @Slot()
+    def clearCaptions(self):
+        self.reset_captions()
+        self.changed.emit()
 
     @Property('QVariantMap', notify=changed)
     def state(self):
@@ -173,6 +241,10 @@ class Controller(QObject):
             captionScrollMs=self.caption_scroll_ms if self.caption_layout_name == 'bbc_live' else 0,
             override=self.override,
             status=self.status,
+            captionRestartAvailable=self.process is not None and not self.restarting_captions,
+            recoveryStatus=self.recovery_status,
+            captionActivity=('Last speech text: ' + str(max(0, int(time.monotonic() - self.last_caption_event))) + ' s ago'
+                             if self.last_caption_event is not None else 'No speech text received yet'),
             logPath=self.log_path,
             error=self.error,
             timerTime=display_time,
@@ -214,6 +286,7 @@ class Controller(QObject):
         if value in ('AUTO', 'WHITE', 'SPEAKERS'):
             self.speaker_override = value
             self.reset_captions()
+            self.persist_checkpoint()
             logger.info('Speaker display override: %s', value)
             self.changed.emit()
 
@@ -298,6 +371,7 @@ class Controller(QObject):
             logger.info('Slide %s/%s id=%s', self.timeline.index + 1, len(self.timeline.slides), self.timeline.slide.get('id', ''))
             self.reset_captions()
             self.restartCredits()
+            self.persist_checkpoint()
         self.changed.emit()
 
     @Slot(str)
@@ -305,20 +379,25 @@ class Controller(QObject):
         if value in ('AUTO', 'ON', 'OFF'):
             logger.info('Caption override: %s', value)
             self.override = value
+            self.persist_checkpoint()
             self.reset_captions()
             self.changed.emit()
 
     @Slot()
     def timerToggle(self):
         self.timeline.toggle_timer()
+        self.persist_checkpoint()
         self.changed.emit()
 
     @Slot()
     def timerStopRestart(self):
         self.timeline.stop_restart()
+        self.persist_checkpoint()
         self.changed.emit()
 
     def ingest(self, kind, text):
+        if kind in ('caption', 'partial', 'final') and text:
+            self.last_caption_event = time.monotonic()
         if kind in ('caption', 'partial', 'final') and text and not self.received_caption:
             self.received_caption = True
             logger.info('First caption received (transcript omitted)')
@@ -410,7 +489,7 @@ class Controller(QObject):
             self.stderr_tail = text[-400:]
 
     def process_error(self, error):
-        if self.closing:
+        if self.closing or self.restarting_captions:
             return
         self.read_diagnostics(final=True)
         detail = ': ' + self.stderr_tail if self.stderr_tail else ''
@@ -420,6 +499,10 @@ class Controller(QObject):
         self.read_caption()
         self.read_diagnostics(final=True)
         logger.info('Caption process exited: code=%s status=%s requested_shutdown=%s', code, status, self.closing)
+        if self.restarting_captions and not self.closing:
+            self.restart_kill_timer.stop()
+            QTimer.singleShot(0, self.start_caption_source)
+            return
         if not self.closing:
             if code != 0:
                 detail = self.stderr_tail or 'No diagnostic output; see log for process details'
@@ -447,6 +530,9 @@ class Controller(QObject):
             self.demo_index += 1
             self.last_demo = now
 
+        if self.checkpoint is not None and now - self.last_checkpoint >= 1:
+            self.persist_checkpoint()
+
         if self.caption and now - self.caption_at > 8:
             self.reset_captions()
 
@@ -454,6 +540,10 @@ class Controller(QObject):
 
     def close(self):
         self.closing = True
+        self.timer.stop()
+        self.restart_kill_timer.stop()
+        self.audience_display.cancel()
+        self.persist_checkpoint()
         logger.info('Presentation shutting down')
         if (
             self.process
@@ -539,15 +629,20 @@ def main():
     parser.add_argument('--caption-layout', choices=('bbc_live', 'bbc', 'rolling'), default='bbc_live',
                         help='Caption layout (default: bbc_live; bbc and rolling are legacy options)')
 
+    parser.add_argument('--resume', action='store_true', help='Save progress and resume the last saved slide after relaunch')
+    parser.add_argument('--fresh-start', action='store_true', help='Start at slide 1 instead of restoring progress (with --resume)')
+    parser.add_argument('--state-file', type=Path, default=Path('logs/event-state.json'), help='Recovery checkpoint file')
+    parser.add_argument('--slides-only', action='store_true', help='Run without microphone, transcription or synthetic captions')
+
     args = parser.parse_args()
     if args.export_pdf and (args.live or args.replay):
         parser.error('--export-pdf cannot be combined with --live or --replay')
     if args.pdf_subtitles and not args.export_pdf:
         parser.error('--pdf-subtitles requires --export-pdf')
-    args.demo = not (args.live or args.replay)
+    args.demo = args.slides_only or not (args.live or args.replay)
     args.caption_settings = {}
     args.diarization_enabled = False
-    if (not args.demo or args.vocabulary is not None or args.diarization is not None
+    if not args.slides_only and (not args.demo or args.vocabulary is not None or args.diarization is not None
             or args.speaker_colours is not None or Path(args.caption_config).expanduser().exists()):
         try:
             root = str(Path(args.live_caption).expanduser().resolve() / 'src')
@@ -569,7 +664,7 @@ def main():
     except OSError as exc:
         parser.exit(1, f'Cannot open diagnostic log: {exc}. Use --log-dir with a writable directory.\n')
     logger.info('Starting Cadenza mode=%s show=%s log=%s',
-                'export' if args.export_pdf else 'demo' if args.demo else 'replay' if args.replay else 'live',
+                'export' if args.export_pdf else 'slides-only' if args.slides_only else 'demo' if args.demo else 'replay' if args.replay else 'live',
                 args.show.resolve(), args.log_path)
     def report_exception(exc_type, value, traceback):
         logger.critical('Unhandled application exception', exc_info=(exc_type, value, traceback))

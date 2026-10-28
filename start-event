@@ -2,4 +2,8 @@
 # Start the event from this checkout, even when invoked from another directory.
 set -eu
 cd -- "$(dirname -- "$0")"
-exec uv run cadenza --live --caption-config ./config/caption-config.yaml --diarization speaker "$@"
+# Keep macOS and its displays awake while the event app runs.
+if command -v caffeinate >/dev/null 2>&1; then
+    exec caffeinate -di uv run cadenza --live --caption-config ./config/caption-config.yaml --diarization speaker --resume "$@"
+fi
+exec uv run cadenza --live --caption-config ./config/caption-config.yaml --diarization speaker --resume "$@"
