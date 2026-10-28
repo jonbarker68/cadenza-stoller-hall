@@ -1,0 +1,5 @@
+#!/bin/sh
+# Start the event from this checkout, even when invoked from another directory.
+set -eu
+cd -- "$(dirname -- "$0")"
+exec uv run cadenza --live --caption-config ./config/caption-config.yaml --diarization speaker "$@"

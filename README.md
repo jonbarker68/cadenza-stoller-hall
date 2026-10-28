@@ -18,6 +18,27 @@ Run commands from the project root: the default configuration paths are relative
 
 `src/*.egg-info`, `.venv`, and `__pycache__` are generated development files, already ignored by Git; `uv.lock` is the dependency lockfile and should be kept.
 
+## Start the event
+
+Run this in Terminal:
+
+```sh
+cd /Users/jon/projects/cadenza-stoller-hall
+./start-event
+```
+
+This launches the presentation with **live microphone captions and speaker diarization enabled**, using your local `config/caption-config.yaml`. The shortcut runs:
+
+```sh
+uv run cadenza --live --caption-config ./config/caption-config.yaml --diarization speaker
+```
+
+From another directory, you can run `/Users/jon/projects/cadenza-stoller-hall/start-event` directly; it automatically uses the project directory. Extra options can be appended, for example `./start-event --caption-config /path/to/another.yaml`. Use `./start-event --help` to see the available options without starting the event.
+
+Speaker diarization identifies different speakers. Caption colours follow your configured display policy; use **Speaker colours → SPEAKERS** on the control panel to display them, or **WHITE** for white captions. Select the audience monitor and click **Present full screen** when ready. Closing the operator window stops the presentation and live caption worker.
+
+Before using the shortcut for the first time, complete the setup below (`uv sync`, the local caption configuration/API key, the live-caption environment, and microphone permission).
+
 ## Run now
 
 The existing live-caption environment already contains the required libraries:
