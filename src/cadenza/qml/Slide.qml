@@ -5,6 +5,8 @@ Rectangle {
     objectName: "presentationSlide"
     color: DisplayStyle.background
     property var state: controller.state
+    property bool audienceOutput: false
+    readonly property string outputMode: audienceOutput ? state.audienceMode : "normal"
     property bool excerptSlide: state.kind === "experiment" || state.kind === "response" || state.movement.length > 0
     property int contentAlignment: state.style.alignment === "center" ? Text.AlignHCenter
                                    : state.style.alignment === "right" ? Text.AlignRight
@@ -17,6 +19,18 @@ Rectangle {
         width / DisplayStyle.referenceWidth,
         height / DisplayStyle.referenceHeight
     )
+
+    // Only two-column text opts into whole-line italics; all other slide
+    // content remains plain text. Escape input before adding our own tags.
+    function formatColumn(value) {
+        function escapeText(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        }
+        return value.split("\n").map(function(line) {
+            var italic = /^_(.+)_$/.exec(line.trim())
+            return italic ? "<i>" + escapeText(italic[1]) + "</i>" : escapeText(line)
+        }).join("<br/>")
+    }
 
     ArrivalsSlide {
         anchors.fill: parent
@@ -105,7 +119,8 @@ Rectangle {
                 SlideText {
                     objectName: "speakerColumn" + index
                     width: (parent.width - 40 * slide.scaleUnit) / 2
-                    text: modelData
+                    text: slide.formatColumn(modelData)
+                    textFormat: Text.StyledText
                     appearance: slide.state.style.body || ({})
                     scaleUnit: slide.scaleUnit
                     defaultFontPx: DisplayStyle.bodyFontPx
@@ -251,9 +266,16 @@ Rectangle {
         scaleUnit: slide.scaleUnit
     }
 
+    Rectangle {
+        objectName: "audienceOutputMask"
+        anchors.fill: parent
+        color: "black"
+        visible: slide.outputMode !== "normal"
+    }
+
     CaptionBand {
         objectName: "captionBand"
-        visible: slide.state.layout !== "closing-credits" && slide.state.captions && slide.state.caption.length > 0
+        visible: slide.outputMode !== "blackout" && (slide.state.layout !== "closing-credits" || slide.outputMode === "captions") && slide.state.captions && slide.state.caption.length > 0
         state: slide.state
         scaleUnit: slide.scaleUnit
         anchors.bottom: parent.bottom

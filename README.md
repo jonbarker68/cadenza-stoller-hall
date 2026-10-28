@@ -93,6 +93,7 @@ uv run cadenza --replay /absolute/path/to/session.jsonl
 
 - Choose the audience monitor and select **Present full screen**. The operator window stays on its current screen. Escape returns the audience window to windowed mode.
 - **Next/Back**, Right/Left arrows, and Space (next) advance the sequence. Navigation stops at the first and last slide.
+- **Hide slides, keep captions** covers the audience slide with black while allowing captions through according to AUTO/ON/OFF. **Blackout everything** hides both slides and captions. The control-panel preview remains visible, and a red indicator shows that the audience view is hidden. **Restore screen** restores the current slide; clicking the active hide/blackout button also restores it. Navigation, timers and transcription keep running while hidden. These temporary display modes remain active when changing slides; relaunching the app returns the audience view to normal. PDF previews are unaffected.
 - **AUTO** follows each slide's `captions` setting; **ON/OFF** overrides it. Changing slides or overrides clears old text. Caption text expires after eight seconds without updates.
 - Countdown and count-up slides share one Timer row with two buttons. Both wait for Start on entry. Start/Pause/Resume controls the current run; Stop freezes it and changes to Restart, which starts a fresh run. At countdown zero, use Restart or advance manually. Revisiting a timer slide resets it and waits for Start.
 - Captions being hidden does **not** stop microphone capture or transcription. Live mode streams continuously until the application closes.
@@ -103,6 +104,8 @@ uv run cadenza --replay /absolute/path/to/session.jsonl
 Edit `config/show.yaml`, or copy it and pass `--show /path/to/programme.yaml`. Each slide needs a unique string `id`, `kind`, and text `title`. Supported kinds: `intro`, `mc`, `experiment`, `music`, `response`, `countup`, `closing`. Optional fields: `body`, `notes` (operator only), `captions` (boolean, default false), `passage`, `page`. Response slides require a positive `duration` in seconds.
 
 The audience view uses the title/body, persistent excerpt (`passage`) and booklet `page` labels on every applicable slide, response ring and digital countdown, and a separate caption band. Music slides are presentation states: they do not play audio or cue external equipment. Use short titles/body text and rehearse the actual content on the venue display.
+
+For slides using `layout: two-columns`, wrap an entire line in underscores to italicise it—for example `_University of Salford_` beneath a presenter's name in `body` or `subtitle`. Other lines keep their usual styling, including their font size. This convention only applies to the two-column text; raw HTML is displayed literally.
 
 ## Architecture and checks
 

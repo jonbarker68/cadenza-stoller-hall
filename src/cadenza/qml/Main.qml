@@ -62,11 +62,46 @@ ApplicationWindow {
             ComboBox { model: ["AUTO", "ON", "OFF"]; currentIndex: model.indexOf(operator.s.override); onActivated: controller.setOverride(currentText) }
             Label { text: operator.s.captions ? "Visible" : "Hidden" }
         }
+        RowLayout {
+            Layout.minimumHeight: 36; Layout.maximumHeight: 36
+            Button {
+                objectName: "hideSlidesButton"
+                text: "Hide slides, keep captions"
+                checkable: true
+                checked: operator.s.audienceMode === "captions"
+                onClicked: controller.setAudienceMode(operator.s.audienceMode === "captions" ? "normal" : "captions")
+            }
+            Button {
+                objectName: "blackoutButton"
+                text: "Blackout everything"
+                checkable: true
+                checked: operator.s.audienceMode === "blackout"
+                onClicked: controller.setAudienceMode(operator.s.audienceMode === "blackout" ? "normal" : "blackout")
+            }
+            Button {
+                objectName: "restoreAudienceButton"
+                text: "Restore screen"
+                enabled: operator.s.audienceMode !== "normal"
+                onClicked: controller.setAudienceMode("normal")
+            }
+            Label {
+                objectName: "audienceModeIndicator"
+                Layout.fillWidth: true
+                font.bold: true
+                text: operator.s.audienceMode === "blackout" ? "AUDIENCE SCREEN BLACKED OUT"
+                    : operator.s.audienceMode === "captions" ? "SLIDES HIDDEN"
+                    : "Audience screen live"
+                color: operator.s.audienceMode === "normal" ? "#27583b" : "#a12424"
+                elide: Text.ElideRight
+                Accessible.name: text
+            }
+        }
         Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.minimumHeight: 120
             Slide {
+                objectName: "operatorPreviewSlide"
                 anchors.centerIn: parent
                 width: Math.min(parent.width, parent.height * 16 / 9)
                 height: width * 9 / 16
@@ -164,7 +199,7 @@ ApplicationWindow {
         title: "Cadenza · Audience"; visible: true; width: 1280; height: 720
         color: DisplayStyle.background
         onClosing: { controller.cancelAudiencePresentation(); audience.hide(); }
-        Slide { anchors.fill: parent }
+        Slide { objectName: "audienceSlide"; anchors.fill: parent; audienceOutput: true }
         Shortcut { sequence: "Escape"; onActivated: { controller.cancelAudiencePresentation(); audience.showNormal(); operator.raise(); } }
         Shortcut { sequence: "Right"; onActivated: controller.move(1) }
         Shortcut { sequence: "Left"; onActivated: controller.move(-1) }

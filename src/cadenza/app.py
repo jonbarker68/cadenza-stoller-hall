@@ -32,6 +32,7 @@ class Controller(QObject):
         self.credits_saved = 0.0
         self.credits_paused = False
         self.static_export = bool(getattr(args, 'static_export', False))
+        self.audience_mode = 'normal'
         self.override = 'AUTO'
         self.speaker_override = 'AUTO'
         self.caption = ''
@@ -206,6 +207,7 @@ class Controller(QObject):
             creditsElapsed=self.credits_saved + (0 if self.credits_paused else time.monotonic() - self.credits_started),
             creditsPaused=self.credits_paused,
             staticExport=self.static_export,
+            audienceMode=self.audience_mode,
             title=s['title'],
             layout=s.get('layout', ''),
             body=s.get('body', ''),
@@ -335,6 +337,13 @@ class Controller(QObject):
         return [f"{i + 1}. {slide['title']}"
                 + (f" — excerpt {slide['passage']}" if slide.get('passage') else '')
                 for i, slide in enumerate(self.timeline.slides)]
+
+    @Slot(str)
+    def setAudienceMode(self, mode):
+        if mode in ('normal', 'captions', 'blackout'):
+            self.audience_mode = mode
+            logger.info('Audience screen mode: %s', mode)
+            self.changed.emit()
 
     @Slot(QObject, int, bool)
     def presentAudience(self, window, index, fullscreen):

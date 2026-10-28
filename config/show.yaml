@@ -333,16 +333,16 @@ slides:
   title: Question & Answer
   body: |-
     Professor Trevor Cox
-    University of Salford
+    _University of Salford_
 
     Dr Bruno Fazenda
-    University of Salford
+    _University of Salford_
   subtitle: |-
     Professor Alinka Greasley
-    University of Leeds
+    _University of Leeds_
 
     Dr William Whitmer
-    University of Nottingham
+    _University of Nottingham_
   captions: true
   style:
     alignment: center
