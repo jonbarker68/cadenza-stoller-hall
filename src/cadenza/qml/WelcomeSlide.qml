@@ -23,12 +23,13 @@ Item {
             wrapMode: Text.Wrap
         }
         Text {
+            objectName: "welcomeIntroduction"
             x: 70 * welcome.scaleUnit
             y: 192 * welcome.scaleUnit
             width: 1140 * welcome.scaleUnit
             text: welcome.state.body
             textFormat: Text.PlainText
-            font.pixelSize: 22 * welcome.scaleUnit
+            font.pixelSize: 32 * welcome.scaleUnit
             color: DisplayStyle.bodyText
             wrapMode: Text.Wrap
         }
@@ -102,17 +103,20 @@ Item {
             }
             Row {
                 x: 28 * welcome.scaleUnit
-                y: 188 * welcome.scaleUnit
+                y: 181 * welcome.scaleUnit
                 spacing: 25 * welcome.scaleUnit
                 Repeater {
                     model: ["salford.png", "leeds.svg", "nottingham.svg", "sheffield.svg"]
                     Image {
                         objectName: "logoUniversity" + index
                         width: 252 * welcome.scaleUnit
-                        height: 70 * welcome.scaleUnit
+                        // Sheffield's compact mark needs a taller display
+                        // box to balance the other university wordmarks.
+                        y: modelData === "sheffield.svg" ? 0 : 7 * welcome.scaleUnit
+                        height: (modelData === "sheffield.svg" ? 84 : 70) * welcome.scaleUnit
                         source: "assets/logos/" + modelData
                         sourceSize.width: 504
-                        sourceSize.height: 140
+                        sourceSize.height: modelData === "sheffield.svg" ? 168 : 140
                         fillMode: Image.PreserveAspectFit
                     }
                 }
